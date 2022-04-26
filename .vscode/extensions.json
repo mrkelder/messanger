@@ -1,0 +1,10 @@
+{
+	"recommendations": [
+		"mikestead.dotenv",
+    "angelorafael.jsx-html-tags",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "dsznajder.es7-react-js-snippets",
+    "foxundermoon.next-js"
+	]
+}
