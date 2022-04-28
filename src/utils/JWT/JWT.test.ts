@@ -1,45 +1,41 @@
-let JWT: any;
+import JWT from "./JWT";
+import { AccessRefreshSecrets, TokenPayload } from "./JWTTypes";
 
-interface AccessRefreshTokens {
-  access: string;
-  refresh: string;
-}
-
-interface CreateTokenInfo {
-  _id: string;
-}
-
-const tokenPair: AccessRefreshTokens = {
+const tokenPair: AccessRefreshSecrets = {
   access: "access-token",
   refresh: "refresh-token"
 };
 
-const tokenInfo: CreateTokenInfo = { _id: "507f191e810c19729de860ea" };
+const tokenPayload: TokenPayload = { _id: "507f191e810c19729de860ea" };
 
-const expectedAccessToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1MDdmMTkxZTgxMGMxOTcyOWRlODYwZWEiLCJleHBpcmVzSW4iOiI2MDAwMDAifQ.6TnJM8jDmKNJLZXKHClnwDduKwXTPpkjMK-5T7XolzY";
-
-const expectedRefreshToken =
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1MDdmMTkxZTgxMGMxOTcyOWRlODYwZWEiLCJleHBpcmVzSW4iOiI2MDAwMDAifQ.qzccIExLIHAg8wlT_R09s3AxQqV4gNGTpoPZkedfNSw";
-
-const jwt = new JWT(tokenPair);
+const jwt = new JWT(tokenPair, tokenPayload);
 
 describe("Json Web Token class", () => {
-  test("Should generate a valid access token", () => {
-    const actualAccessToken = jwt.createAcessToken(tokenInfo);
-    expect(actualAccessToken).toBe(expectedAccessToken);
+  let accessToken: string;
+  let refreshToken: string;
+
+  test("Should result in an access token", () => {
+    accessToken = jwt.createAccessToken();
+    expect(accessToken).toBeDefined();
   });
 
-  test("Should generate a valid refresh token", () => {
-    const actualRefreshToken = jwt.createRefreshToken(tokenInfo);
-    expect(actualRefreshToken).toBe(expectedRefreshToken);
+  test("Should result in a refresh token", () => {
+    refreshToken = jwt.createRefreshToken();
+    expect(refreshToken).toBeDefined();
   });
 
   test("Should validate access and refresh tokens successfully", () => {
-    const accessTokenValidation = jwt.validateAccessToken();
-    const refreshTokenValidation = jwt.validateRefreshToken();
-
+    const accessTokenValidation = jwt.validateAccessToken(accessToken);
+    const refreshTokenValidation = jwt.validateRefreshToken(refreshToken);
     expect(accessTokenValidation).toBeTruthy();
     expect(refreshTokenValidation).toBeTruthy();
+  });
+
+  test("Should extract the same _id from both access and refresh tokens' payloads", () => {
+    const { _id: accessTokenId } = jwt.extractTokenPayload(accessToken);
+    const { _id: refreshTokenId } = jwt.extractTokenPayload(refreshToken);
+
+    expect(accessTokenId).toBe(tokenPayload._id);
+    expect(refreshTokenId).toBe(tokenPayload._id);
   });
 });
