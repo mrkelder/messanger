@@ -47,7 +47,7 @@ class JWT {
     }
   }
 
-  public extractTokenPayload(token: string): TokenPayload {
+  public static extractTokenPayload(token: string): TokenPayload {
     return new Object(jsonwebtoken.decode(token)) as TokenPayload;
   }
 }

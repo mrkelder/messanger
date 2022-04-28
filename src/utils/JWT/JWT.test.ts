@@ -32,8 +32,8 @@ describe("Json Web Token class", () => {
   });
 
   test("Should extract the same _id from both access and refresh tokens' payloads", () => {
-    const { _id: accessTokenId } = jwt.extractTokenPayload(accessToken);
-    const { _id: refreshTokenId } = jwt.extractTokenPayload(refreshToken);
+    const { _id: accessTokenId } = JWT.extractTokenPayload(accessToken);
+    const { _id: refreshTokenId } = JWT.extractTokenPayload(refreshToken);
 
     expect(accessTokenId).toBe(tokenPayload._id);
     expect(refreshTokenId).toBe(tokenPayload._id);
