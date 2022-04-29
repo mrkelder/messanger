@@ -64,6 +64,9 @@ To run a script use `npm run <script_name>` construction. Here's a list of all a
 - **build-storybook** - builds a storybook static documentation page
 - **chromatic** - performs screenshot tests by sending screenshots to chromatic service
 - **cypress:open** - calls up cypress testing environment window
+- **test:all** - runs all \*.test.ts(x) files
+- **test:utils** - runs all tests in **src/utils** directory
+- **test:api** - runs all tests in **\_\_test\_\_/api** directory
 
 ## Architecture
 
@@ -88,7 +91,7 @@ const Button: FC<Props> = ({ text, onClick }) => {
   const [timesClicked, setTimesClicked] = useState(0);
 
   function onClickHanlder() {
-    setTimesClicked((prev) => prev + 1);
+    setTimesClicked(prev => prev + 1);
     onClick();
   }
 
@@ -111,7 +114,7 @@ const Container: FC<ContainerProps> = ({ text, onClick }) => {
   const [timesClicked, setTimesClicked] = useState(0);
 
   function onClickHanlder() {
-    setTimesClicked((prev) => prev + 1);
+    setTimesClicked(prev => prev + 1);
     onClick();
   }
 
@@ -234,7 +237,7 @@ Constants are usually used across the whole project from components to redux act
 
 ## Environments
 
-Environment variables are stored in .env.development and .evn.production files at the root level. Data should be passed accroding to the current mode (either dev or production)
+Environment variables are stored in .env.development.local, .evn.production.local, and .env.test.local files at the root level. Data should be passed accroding to the current mode (either dev or production)
 
 - ACCESS_TOKEN_SECRET - a secret combination of symbols for an access token (shouldn't be longer than 100 symbols)
 - REFRESH_TOKEN_SECRET - a secret combination of symbols for a refresh token (shouldn't be longer than 100 symbols)
@@ -245,17 +248,27 @@ Environment variables are stored in .env.development and .evn.production files a
 Here's an example of both files
 
 ```
-# .env.development
+# .env.development.local
 
 ACCESS_TOKEN_SECRET="access_secret"
 REFRESH_TOKEN_SECRET="refresh_secret"
 MONGODB_HOST="mongodb://127.0.0.1:27017/name"
 
-NEXT_PUBLIC_HOST="http://127.0.0.1"
+NEXT_PUBLIC_HOST="http://127.0.0.1:3000"
 ```
 
 ```
-# .env.production
+# .env.test.local
+
+ACCESS_TOKEN_SECRET="test"
+REFRESH_TOKEN_SECRET="test"
+MONGODB_HOST="mongodb://127.0.0.1:27017/name-test"
+
+NEXT_PUBLIC_HOST="http://127.0.0.1:3000"
+```
+
+```
+# .env.production.local
 
 ACCESS_TOKEN_SECRET="j28dfboi8781so9wfinuxjw387c"
 REFRESH_TOKEN_SECRET="jc71990djf91kkc82h1vienos"
