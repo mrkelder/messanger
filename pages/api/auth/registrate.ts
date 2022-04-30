@@ -21,22 +21,22 @@ class Registration {
   }
 
   public async run() {
-    if (this.areNameAndPasswordDefined()) await this.nameAndPasswordDefined();
-    else this.nameOrPasswordUndefined();
+    if (this.areNameAndPasswordDefined()) await this.checkIfUserExists();
+    else this.throwNameOrPasswordUndefinedError();
   }
 
   private areNameAndPasswordDefined(): boolean {
     return !!this.name && !!this.password;
   }
 
-  private nameOrPasswordUndefined() {
+  private throwNameOrPasswordUndefinedError() {
     this.response.status(403).send("Either name or password was not provided");
   }
 
-  private async nameAndPasswordDefined() {
+  private async checkIfUserExists() {
     await this.lookForUsers();
     if (this.foundUsers.length > 0) this.throwUserExistsError();
-    else await this.createUserAndRespondSuccessfully();
+    else await this.completeRegistration();
   }
 
   private async lookForUsers() {
@@ -47,10 +47,18 @@ class Registration {
     this.response.status(409).send("The user already exists");
   }
 
-  private async createUserAndRespondSuccessfully() {
+  private async completeRegistration() {
+    await this.createUser();
+    this.sendSuccessResponse();
+  }
+
+  private async createUser() {
     const encryptedPassword = await bcrypt.hash(this.password, 10);
     const newUser = new User({ name: this.name, password: encryptedPassword });
     await newUser.save();
+  }
+
+  private sendSuccessResponse() {
     this.response.status(200).send("Success");
   }
 }
