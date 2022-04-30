@@ -40,7 +40,7 @@ describe("Registration", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified name", async () => {
+  test("Should throw an error because of an unspecified name", async () => {
     try {
       await axios.post(registrateAPI, testUserWithoutNameBody, conf);
     } catch ({ message }) {
@@ -48,7 +48,7 @@ describe("Registration", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified password", async () => {
+  test("Should throw an error because of an unspecified password", async () => {
     try {
       await axios.post(registrateAPI, testUserWithouPasswordBody, conf);
     } catch ({ message }) {
@@ -87,7 +87,7 @@ describe("Authorization", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified name", async () => {
+  test("Should throw an error because of an unspecified name", async () => {
     try {
       await axios.post(authorizateAPI, testUserWithoutNameBody, conf);
     } catch ({ message }) {
@@ -95,7 +95,7 @@ describe("Authorization", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified password", async () => {
+  test("Should throw an error because of an unspecified password", async () => {
     try {
       await axios.post(authorizateAPI, testUserWithouPasswordBody, conf);
     } catch ({ message }) {
