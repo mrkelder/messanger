@@ -2,15 +2,19 @@ import { NextApiRequest } from "next";
 
 import RequestHelper from "./RequestHelper";
 
-const body = { foo: "bar" };
+const objectBody = { foo: "bar" };
+const arrayBody = [1, 2, 3];
 
 const mockRequestWtihGetMethod = { method: "GET" };
 const mockRequestWtihPostMethod = {
   method: "POST",
-  body: JSON.stringify(body)
+  body: JSON.stringify(objectBody)
 };
-const mockRequestWtihPutMethod = { method: "PUT" };
-const mockRequestWtihDeleteMethod = { method: "DELETE" };
+const mockRequestWtihPutMethod = { method: "PUT", body: arrayBody };
+const mockRequestWtihDeleteMethod = {
+  method: "DELETE",
+  body: "{ ;23 2ioeiodfjke"
+};
 
 const requestHelperWithGetMethod = new RequestHelper(
   mockRequestWtihGetMethod as NextApiRequest
@@ -58,7 +62,15 @@ describe("RequestHelper class", () => {
     expect(requestHelperWithDeleteMethod.isPOST()).toBeFalsy();
   });
 
-  test("Should successfully extract data out of body", () => {
-    expect(requestHelperWithPostMethod.getBody()).toEqual(body);
+  test("Should successfully extract object", () => {
+    expect(requestHelperWithPostMethod.getBody()).toEqual(objectBody);
+  });
+
+  test("Should successfully extract array", () => {
+    expect(requestHelperWithPutMethod.getBody()).toEqual(arrayBody);
+  });
+
+  test("Should return null", () => {
+    expect(requestHelperWithDeleteMethod.getBody()).toBeNull();
   });
 });
