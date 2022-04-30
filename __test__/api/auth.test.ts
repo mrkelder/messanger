@@ -15,10 +15,16 @@ const testUser = {
 
 const testUserBody = JSON.stringify(testUser);
 const testUserWithoutNameBody = JSON.stringify({ password: testUser.password });
-const testUserWithouPasswordBody = JSON.stringify({ name: testUser.name });
+const testUserWithoutPasswordBody = JSON.stringify({ name: testUser.name });
 
-const testUserWithWrongNameBody = JSON.stringify(testUser);
-const testUserWithWrongPasswordBody = JSON.stringify(testUser);
+const testUserWithWrongNameBody = JSON.stringify({
+  password: testUser.password,
+  name: "some-other-user"
+});
+const testUserWithWrongPasswordBody = JSON.stringify({
+  name: testUser.name,
+  password: "some-other-password"
+});
 
 jest.setTimeout(15 * 1000);
 
@@ -40,7 +46,7 @@ describe("Registration", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified name", async () => {
+  test("Should throw an error because of an unspecified name", async () => {
     try {
       await axios.post(registrateAPI, testUserWithoutNameBody, conf);
     } catch ({ message }) {
@@ -48,9 +54,9 @@ describe("Registration", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified password", async () => {
+  test("Should throw an error because of an unspecified password", async () => {
     try {
-      await axios.post(registrateAPI, testUserWithouPasswordBody, conf);
+      await axios.post(registrateAPI, testUserWithoutPasswordBody, conf);
     } catch ({ message }) {
       expect(message).toMatch("403");
     }
@@ -87,7 +93,7 @@ describe("Authorization", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified name", async () => {
+  test("Should throw an error because of an unspecified name", async () => {
     try {
       await axios.post(authorizateAPI, testUserWithoutNameBody, conf);
     } catch ({ message }) {
@@ -95,9 +101,9 @@ describe("Authorization", () => {
     }
   });
 
-  test("Should throw an errors because of an unspecified password", async () => {
+  test("Should throw an error because of an unspecified password", async () => {
     try {
-      await axios.post(authorizateAPI, testUserWithouPasswordBody, conf);
+      await axios.post(authorizateAPI, testUserWithoutPasswordBody, conf);
     } catch ({ message }) {
       expect(message).toMatch("403");
     }
