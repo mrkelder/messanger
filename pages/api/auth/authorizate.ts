@@ -48,7 +48,7 @@ class Authorization {
   }
 
   private async checkCredentials() {
-    if (await this.areCredentialsEqual()) this.sendSuccessfulResponse();
+    if (await this.areCredentialsEqual()) this.sendSuccessResponse();
     else this.throwCredentialsUnequal();
   }
 
@@ -59,7 +59,7 @@ class Authorization {
     );
   }
 
-  public sendSuccessfulResponse() {
+  public sendSuccessResponse() {
     this.response.status(200).json(this.foundUser);
   }
 
