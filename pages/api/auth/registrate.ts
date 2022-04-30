@@ -3,31 +3,78 @@ import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import User from "src/models/User";
+import { Credentials } from "src/types/auth";
+import { DatabaseUser } from "src/types/db";
+import RequestHelper from "src/utils/RequestHelper";
+
+class Registration {
+  private name: string;
+  private password: string;
+  private response: NextApiResponse;
+  private foundUsers: DatabaseUser[] = [];
+
+  constructor(credentials: Credentials, res: NextApiResponse) {
+    const { name, password } = credentials;
+    this.name = name;
+    this.password = password;
+    this.response = res;
+  }
+
+  public async run() {
+    if (this.areNameAndPasswordDefined()) await this.checkIfUserExists();
+    else this.throwNameOrPasswordUndefinedError();
+  }
+
+  private areNameAndPasswordDefined(): boolean {
+    return !!this.name && !!this.password;
+  }
+
+  private throwNameOrPasswordUndefinedError() {
+    this.response.status(403).send("Either name or password was not provided");
+  }
+
+  private async checkIfUserExists() {
+    await this.lookForUsers();
+    if (this.foundUsers.length > 0) this.throwUserExistsError();
+    else await this.completeRegistration();
+  }
+
+  private async lookForUsers() {
+    this.foundUsers = await User.findByName(this.name);
+  }
+
+  private throwUserExistsError() {
+    this.response.status(409).send("The user already exists");
+  }
+
+  private async completeRegistration() {
+    await this.createUser();
+    this.sendSuccessResponse();
+  }
+
+  private async createUser() {
+    const encryptedPassword = await bcrypt.hash(this.password, 10);
+    const newUser = new User({ name: this.name, password: encryptedPassword });
+    await newUser.save();
+  }
+
+  private sendSuccessResponse() {
+    this.response.status(200).send("Success");
+  }
+}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  if (req.method?.toLocaleLowerCase() === "post") {
+  const requestHelper = new RequestHelper(req);
+
+  if (requestHelper.isPOST()) {
     try {
-      const { name, password } = JSON.parse(req.body);
-
-      if (!name || !password) {
-        res.status(403).send("Either name or password was not provided");
-        return;
-      }
-
+      const credentials = requestHelper.getBody();
+      const registration = new Registration(credentials, res);
       await mongoose.connect(process.env.MONGODB_HOST as string);
-
-      const lookUpUsers = await User.findByName(name);
-
-      if (lookUpUsers.length === 0) {
-        const encryptedPassword = await bcrypt.hash(password, 10);
-
-        const newUser = new User({ name, password: encryptedPassword });
-        await newUser.save();
-        res.status(200).send("Success");
-      } else res.status(409).send("The user already exists");
+      await registration.run();
     } catch (err) {
       res.status(500).send("Server could not handle the request");
     } finally {

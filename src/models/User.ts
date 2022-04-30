@@ -1,11 +1,10 @@
 import { Schema, models, model, Document, Model } from "mongoose";
 
+import { DatabaseUser } from "src/types/db";
+
 import { USER_MODEL_NAME } from "./CONSTANTS";
 
-interface UserDocument extends Document {
-  name: string;
-  password: string;
-}
+type UserDocument = Document & Omit<DatabaseUser, "_id">;
 
 interface UserModel extends Model<UserDocument> {
   findByName(name: string): Promise<Array<UserDocument>>;
