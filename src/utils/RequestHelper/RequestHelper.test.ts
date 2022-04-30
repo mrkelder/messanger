@@ -71,6 +71,6 @@ describe("RequestHelper class", () => {
   });
 
   test("Should return null", () => {
-    expect(requestHelperWithDeleteMethod.getBody()).toBeNull();
+    expect(requestHelperWithDeleteMethod.getBody()).toBeUndefined();
   });
 });

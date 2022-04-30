@@ -1,6 +1,5 @@
 import { NextApiRequest } from "next";
 
-type GetBodyReturnValue = any[] | Object | null;
 type HttpMethods = "GET" | "POST" | "PUT" | "DELETE";
 
 class RequestHelper {
@@ -10,14 +9,14 @@ class RequestHelper {
     this.request = req;
   }
 
-  public getBody(): GetBodyReturnValue {
+  public getBody(): any {
     try {
       const { body } = this.request;
       if (typeof body === "string") return JSON.parse(body);
       else if (typeof body === "object") return body as Object;
-      else return null;
+      else return undefined;
     } catch {
-      return null;
+      return undefined;
     }
   }
 
