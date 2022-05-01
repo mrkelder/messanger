@@ -22,4 +22,9 @@ describe("Json Web Token class", () => {
       JWT.verifyRefreshToken(refreshToken);
     }).not.toThrow();
   });
+
+  test("Should extract userId from verificational method", () => {
+    const verification = JWT.verifyAccessToken(accessToken);
+    expect(verification._id).toBe(userId);
+  });
 });
