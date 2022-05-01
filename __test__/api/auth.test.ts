@@ -1,6 +1,7 @@
 import axios from "axios";
 import mongoose from "mongoose";
 
+import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 
 const host = process.env.NEXT_PUBLIC_HOST;
@@ -18,7 +19,11 @@ const testUserWithoutPassword = { name: testUser.name };
 jest.setTimeout(15 * 1000);
 
 async function deleteUser() {
-  await User.deleteByName(testUser.name);
+  const user = (await User.findByName(testUser.name))[0];
+  if (user) {
+    await RefreshToken.deleteByUserId(user._id);
+    await User.deleteByName(testUser.name);
+  }
 }
 
 beforeAll(async () => {
