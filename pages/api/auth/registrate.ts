@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 import { Credentials } from "src/types/auth";
 import { DatabaseUser } from "src/types/db";
@@ -82,7 +83,7 @@ export default async function handler(
 
     private static async completeRegistration() {
       const newUser = await Registration.createUser();
-      Registration.sendSuccessResponse(newUser._id as string);
+      await Registration.sendSuccessResponse(newUser._id as string);
     }
 
     private static async createUser(): Promise<DatabaseUser> {
@@ -96,10 +97,11 @@ export default async function handler(
       return newUser;
     }
 
-    private static sendSuccessResponse(userId: string) {
-      const { accessToken, refreshToken } = Registration.createTokens(userId);
+    private static async sendSuccessResponse(userId: string) {
+      const { accessToken, refreshToken } = await Registration.createTokens(
+        userId
+      );
       res
-        .status(200)
         .setHeader(
           "Set-Cookie",
           `refreshToken=${refreshToken}; httpOnly; max-age=31556952`
@@ -107,13 +109,25 @@ export default async function handler(
         .json({ accessToken });
     }
 
-    private static createTokens(userId: string): {
+    private static async createTokens(userId: string): Promise<{
       accessToken: string;
       refreshToken: string;
-    } {
+    }> {
       const accessToken = JWT.createAccessToken(userId);
       const refreshToken = JWT.createRefreshToken(userId);
+      await Registration.saveRefreshTokenToDatabase(userId, refreshToken);
       return { accessToken, refreshToken };
+    }
+
+    private static async saveRefreshTokenToDatabase(
+      userId: string,
+      refreshToken: string
+    ) {
+      const databaseRefreshToken = new RefreshToken({
+        userId: new mongoose.Types.ObjectId(userId),
+        token: refreshToken
+      });
+      await databaseRefreshToken.save();
     }
   }
 

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 import { Credentials } from "src/types/auth";
 import { DatabaseUser } from "src/types/db";
@@ -39,7 +40,7 @@ export default async function handler(
       try {
         await mongoose.connect(process.env.MONGODB_HOST as string);
         await Authorization.tryToAuthorizate();
-      } catch (err) {
+      } catch {
         Authorization.throwServerError();
       } finally {
         if (mongoose.connection.readyState === 1) await mongoose.disconnect();
@@ -60,8 +61,6 @@ export default async function handler(
 
     private static areCredentialsDefined(): boolean {
       const { name, password, accessToken } = Authorization.credentials;
-      console.log(Authorization.credentials);
-
       return !!name && !!password && !!accessToken;
     }
 
@@ -70,12 +69,14 @@ export default async function handler(
     }
 
     private static async verifyAccessToken(accessToken: string) {
+      let _id;
       try {
-        const { _id } = JWT.verifyAccessToken(accessToken);
-        await Authorization.checkIfUserExists(_id);
+        _id = JWT.verifyAccessToken(accessToken)._id;
       } catch {
         Authorization.throwAccessTokenError();
+        return;
       }
+      await Authorization.checkIfUserExists(_id);
     }
 
     private static throwAccessTokenError() {
@@ -84,7 +85,8 @@ export default async function handler(
 
     private static async checkIfUserExists(userId: string) {
       const foundUser = await Authorization.lookForUser(userId);
-      if (foundUser) await Authorization.checkCredentials(foundUser.password);
+      if (foundUser)
+        await Authorization.checkCredentials(foundUser.password, userId);
       else this.throwUserNotFoundError();
     }
 
@@ -98,9 +100,12 @@ export default async function handler(
       res.status(404).send("User not found");
     }
 
-    private static async checkCredentials(actualPassword: string) {
+    private static async checkCredentials(
+      actualPassword: string,
+      userId: string
+    ) {
       if (await Authorization.areCredentialsEqual(actualPassword))
-        Authorization.sendSuccessResponse();
+        await Authorization.sendSuccessResponse(userId);
       else Authorization.throwCredentialsUnequalError();
     }
 
@@ -113,8 +118,28 @@ export default async function handler(
       );
     }
 
-    private static sendSuccessResponse() {
-      res.send("Success");
+    private static async sendSuccessResponse(userId: string) {
+      const { accessToken, refreshToken } = await Authorization.createTokens(
+        userId
+      );
+
+      await RefreshToken.refresh(userId, refreshToken);
+
+      res
+        .setHeader(
+          "Set-Cookie",
+          `refreshToken=${refreshToken}; httpOnly; max-age=31556952`
+        )
+        .json({ accessToken });
+    }
+
+    private static async createTokens(userId: string): Promise<{
+      accessToken: string;
+      refreshToken: string;
+    }> {
+      const accessToken = JWT.createAccessToken(userId);
+      const refreshToken = JWT.createRefreshToken(userId);
+      return { accessToken, refreshToken };
     }
 
     private static throwCredentialsUnequalError() {
