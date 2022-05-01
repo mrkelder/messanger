@@ -8,7 +8,7 @@ import "./User";
 type UserDocument = Document & Omit<DatabseRefreshToken, "_id">;
 
 interface RefreshTokenModel extends Model<UserDocument> {
-  refreshToken(userId: string, newRefreshToken: string): Promise<void>;
+  refresh(userId: string, newRefreshToken: string): Promise<void>;
   deleteByUserId(userId: string): Promise<void>;
 }
 
@@ -18,7 +18,7 @@ const refreshTokenSchema = new Schema({
 });
 
 refreshTokenSchema.static(
-  "refreshToken",
+  "refresh",
   async function (userId: string, newRefreshToken: string) {
     await this.updateOne(
       { userId: new mongoose.Types.ObjectId(userId) },
