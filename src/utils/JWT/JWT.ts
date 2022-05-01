@@ -1,7 +1,7 @@
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 
-const ONE_MONTH_IN_MILLISECONDS = 2629800000;
-const TEN_MINUTES_IN_MILLISECONDS = 600000;
+const ONE_MONTH_IN_MILLISECONDS = "30 days";
+const TEN_MINUTES_IN_MILLISECONDS = "10 minutes";
 
 type VerificationReturnValue = JwtPayload & { _id: string };
 
@@ -22,7 +22,7 @@ class JWT {
   private static createToken(
     userId: string,
     token: string,
-    expiresIn: number
+    expiresIn: string
   ): string {
     return jsonwebtoken.sign({ _id: userId }, token, {
       expiresIn
