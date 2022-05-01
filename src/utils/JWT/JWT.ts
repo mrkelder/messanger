@@ -1,13 +1,13 @@
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 
-const ONE_YEAR_IN_MILLISECONDS = 31556952000;
+const ONE_MONTH_IN_MILLISECONDS = 2629800000;
 const TEN_MINUTES_IN_MILLISECONDS = 600000;
 
 type VerificationReturnValue = JwtPayload & { _id: string };
 
 class JWT {
   private static accessExpirational = TEN_MINUTES_IN_MILLISECONDS;
-  private static refreshExpirational = ONE_YEAR_IN_MILLISECONDS;
+  private static refreshExpirational = ONE_MONTH_IN_MILLISECONDS;
   private static accessSecret = process.env.ACCESS_TOKEN_SECRET as string;
   private static refreshSecret = process.env.REFRESH_TOKEN_SECRET as string;
 
