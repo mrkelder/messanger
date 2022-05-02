@@ -39,14 +39,14 @@ export default async function handler(
       }
     }
 
+    private static throwServerError() {
+      res.status(500).send("Server could not handle the request");
+    }
+
     private static async checkRefreshTokenValue() {
       if (RefreshAccess.oldRefreshToken)
         await RefreshAccess.checkRefreshToken();
       else RefreshAccess.throwRefreshTokenError();
-    }
-
-    private static throwServerError() {
-      res.status(500).send("Server could not handle the request");
     }
 
     private static async checkRefreshToken() {
