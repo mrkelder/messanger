@@ -232,25 +232,17 @@ describe("Authorization", () => {
 });
 
 describe("Access token refreshment", () => {
-  const expiredAccessToken =
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZmYTI0MjkxMzhlZDY0YmIzMjlhZTkiLCJpYXQiOjE2NTE0ODMyMDEsImV4cCI6MTY1MTQ4MzIwMn0.tLvHQe7hzXN7o7hs8zQiEQWr9-Jf4k4V7NySMQoagEU";
-  const expiredAccessTokenPayload = { accessToken: expiredAccessToken };
-
   test("Should succssfully refresh an access token", async () => {
     await registrateUser();
     const { _id } = (await User.findByName(testUser.name))[0];
     const refreshToken = await RefreshToken.findByUserId(_id);
 
     if (refreshToken) {
-      const result = await axios.put(
-        refreshAccessAPI,
-        JSON.stringify(expiredAccessTokenPayload),
-        {
-          headers: {
-            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
-          }
+      const result = await axios.put(refreshAccessAPI, {
+        headers: {
+          "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
         }
-      );
+      });
 
       await deleteUser();
 
@@ -267,15 +259,11 @@ describe("Access token refreshment", () => {
       await deleteUser();
 
       if (refreshToken) {
-        await axios.put(
-          refreshAccessAPI,
-          JSON.stringify(expiredAccessTokenPayload),
-          {
-            headers: {
-              "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
-            }
+        await axios.put(refreshAccessAPI, {
+          headers: {
+            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
           }
-        );
+        });
       }
     } catch (err) {
       expect(err).toMatch("401");
