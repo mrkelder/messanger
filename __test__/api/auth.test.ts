@@ -4,9 +4,10 @@ import mongoose from "mongoose";
 import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 
-const host = process.env.NEXT_PUBLIC_HOST;
-const registrateAPI = host + "/api/auth/registrate";
-const authorizateAPI = host + "/api/auth/authorizate";
+const host = process.env.NEXT_PUBLIC_HOST + "/api/auth";
+const registrateAPI = host + "/registrate";
+const authorizateAPI = host + "/authorizate";
+const refreshAccessAPI = host + "/refreshAccess";
 const conf = { headers: { "Content-Type": "text/plain" } };
 
 const testUser = {
@@ -24,6 +25,15 @@ async function deleteUser() {
     await RefreshToken.deleteByUserId(user._id);
     await User.deleteByName(testUser.name);
   }
+}
+
+async function registrateUser(): Promise<string> {
+  const result = await axios.post(
+    registrateAPI,
+    JSON.stringify(testUser),
+    conf
+  );
+  return result.data.accessToken;
 }
 
 beforeAll(async () => {
@@ -99,15 +109,6 @@ describe("Authorization", () => {
   beforeEach(async () => {
     await deleteUser();
   });
-
-  async function registrateUser(): Promise<string> {
-    const result = await axios.post(
-      registrateAPI,
-      JSON.stringify(testUser),
-      conf
-    );
-    return result.data.accessToken;
-  }
 
   const testUserWithAccessToken = (accessToken: string) => ({
     ...testUser,
@@ -226,6 +227,58 @@ describe("Authorization", () => {
       );
     } catch ({ message }) {
       expect(message).toMatch("404");
+    }
+  });
+});
+
+describe("Access token refreshment", () => {
+  const expiredAccessToken =
+    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjZmYTI0MjkxMzhlZDY0YmIzMjlhZTkiLCJpYXQiOjE2NTE0ODMyMDEsImV4cCI6MTY1MTQ4MzIwMn0.tLvHQe7hzXN7o7hs8zQiEQWr9-Jf4k4V7NySMQoagEU";
+  const expiredAccessTokenPayload = { accessToken: expiredAccessToken };
+
+  test("Should succssfully refresh an access token", async () => {
+    await registrateUser();
+    const { _id } = (await User.findByName(testUser.name))[0];
+    const refreshToken = await RefreshToken.findByUserId(_id);
+
+    if (refreshToken) {
+      const result = await axios.put(
+        refreshAccessAPI,
+        JSON.stringify(expiredAccessTokenPayload),
+        {
+          headers: {
+            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+          }
+        }
+      );
+
+      await deleteUser();
+
+      expect(result.status).toBe(200);
+      expect(result.data).toBeDefined();
+    }
+  });
+
+  test("Should throw an error because the refresh token is deleted", async () => {
+    try {
+      await registrateUser();
+      const { _id } = (await User.findByName(testUser.name))[0];
+      const refreshToken = await RefreshToken.findByUserId(_id);
+      await deleteUser();
+
+      if (refreshToken) {
+        await axios.put(
+          refreshAccessAPI,
+          JSON.stringify(expiredAccessTokenPayload),
+          {
+            headers: {
+              "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+            }
+          }
+        );
+      }
+    } catch (err) {
+      expect(err).toMatch("401");
     }
   });
 });
