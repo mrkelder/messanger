@@ -3,3 +3,9 @@ export interface DatabaseUser {
   name: string;
   password: string;
 }
+
+export interface DatabseRefreshToken {
+  _id?: string;
+  token: string;
+  userId: string;
+}
