@@ -232,8 +232,23 @@ describe("Authorization", () => {
 });
 
 describe("Access token refreshment", () => {
-  test("Should succssfully refresh an access token", async () => {
+  beforeEach(async () => {
     await registrateUser();
+  });
+
+  afterEach(async () => {
+    await deleteUser();
+  });
+
+  test("Should throw an error because of an unspecified refreshToken", async () => {
+    try {
+      await axios.put(refreshAccessAPI);
+    } catch ({ message }) {
+      expect(message).toMatch("401");
+    }
+  });
+
+  test("Should succssfully refresh an access token", async () => {
     const { _id } = (await User.findByName(testUser.name))[0];
     const refreshToken = await RefreshToken.findByUserId(_id);
 
@@ -243,17 +258,13 @@ describe("Access token refreshment", () => {
           "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
         }
       });
-
-      await deleteUser();
-
       expect(result.status).toBe(200);
-      expect(result.data).toBeDefined();
+      expect(result.data.accessToken).toBeDefined();
     }
   });
 
   test("Should throw an error because the refresh token is deleted", async () => {
     try {
-      await registrateUser();
       const { _id } = (await User.findByName(testUser.name))[0];
       const refreshToken = await RefreshToken.findByUserId(_id);
       await deleteUser();
@@ -265,8 +276,25 @@ describe("Access token refreshment", () => {
           }
         });
       }
-    } catch (err) {
-      expect(err).toMatch("401");
+    } catch ({ message }) {
+      expect(message).toMatch("401");
+    }
+  });
+
+  test("Should throw an error because of the wrong http method", async () => {
+    try {
+      const { _id } = (await User.findByName(testUser.name))[0];
+      const refreshToken = await RefreshToken.findByUserId(_id);
+
+      if (refreshToken) {
+        await axios.get(refreshAccessAPI, {
+          headers: {
+            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+          }
+        });
+      }
+    } catch ({ message }) {
+      expect(message).toMatch("405");
     }
   });
 });
