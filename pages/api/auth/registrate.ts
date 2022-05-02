@@ -74,7 +74,7 @@ export default async function handler(
 
     private static async lookForUsers(): Promise<DatabaseUser | undefined> {
       const { name } = Registration.credentials;
-      return (await User.findByName(name))[0] as DatabaseUser | undefined;
+      return await User.findByName(name);
     }
 
     private static throwUserExistsError() {

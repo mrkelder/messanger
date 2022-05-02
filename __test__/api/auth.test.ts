@@ -20,7 +20,7 @@ const testUserWithoutPassword = { name: testUser.name };
 jest.setTimeout(15 * 1000);
 
 async function deleteUser() {
-  const user = (await User.findByName(testUser.name))[0];
+  const user = await User.findByName(testUser.name);
   if (user) {
     await RefreshToken.deleteByUserId(user._id);
     await User.deleteByName(testUser.name);
@@ -249,32 +249,36 @@ describe("Access token refreshment", () => {
   });
 
   test("Should succssfully refresh an access token", async () => {
-    const { _id } = (await User.findByName(testUser.name))[0];
-    const refreshToken = await RefreshToken.findByUserId(_id);
+    const user = await User.findByName(testUser.name);
+    if (user) {
+      const refreshToken = await RefreshToken.findByUserId(user._id);
 
-    if (refreshToken) {
-      const result = await axios.put(refreshAccessAPI, {
-        headers: {
-          "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
-        }
-      });
-      expect(result.status).toBe(200);
-      expect(result.data.accessToken).toBeDefined();
+      if (refreshToken) {
+        const result = await axios.put(refreshAccessAPI, {
+          headers: {
+            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+          }
+        });
+        expect(result.status).toBe(200);
+        expect(result.data.accessToken).toBeDefined();
+      }
     }
   });
 
   test("Should throw an error because the refresh token is deleted", async () => {
     try {
-      const { _id } = (await User.findByName(testUser.name))[0];
-      const refreshToken = await RefreshToken.findByUserId(_id);
-      await deleteUser();
+      const user = await User.findByName(testUser.name);
+      if (user) {
+        const refreshToken = await RefreshToken.findByUserId(user._id);
+        await deleteUser();
 
-      if (refreshToken) {
-        await axios.put(refreshAccessAPI, {
-          headers: {
-            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
-          }
-        });
+        if (refreshToken) {
+          await axios.put(refreshAccessAPI, {
+            headers: {
+              "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+            }
+          });
+        }
       }
     } catch ({ message }) {
       expect(message).toMatch("401");
@@ -283,15 +287,17 @@ describe("Access token refreshment", () => {
 
   test("Should throw an error because of the wrong http method", async () => {
     try {
-      const { _id } = (await User.findByName(testUser.name))[0];
-      const refreshToken = await RefreshToken.findByUserId(_id);
+      const user = await User.findByName(testUser.name);
+      if (user) {
+        const refreshToken = await RefreshToken.findByUserId(user._id);
 
-      if (refreshToken) {
-        await axios.get(refreshAccessAPI, {
-          headers: {
-            "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
-          }
-        });
+        if (refreshToken) {
+          await axios.get(refreshAccessAPI, {
+            headers: {
+              "Set-Cookie": `refreshToken=${refreshToken.token}; httpOnly;`
+            }
+          });
+        }
       }
     } catch ({ message }) {
       expect(message).toMatch("405");
