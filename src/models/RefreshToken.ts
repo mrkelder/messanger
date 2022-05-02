@@ -5,11 +5,17 @@ import { DatabseRefreshToken } from "src/types/db";
 import { USER_MODEL_NAME, REFRESH_TOKEN_MODEL_NAME } from "./CONSTANTS";
 import "./User";
 
-type UserDocument = Document & Omit<DatabseRefreshToken, "_id">;
+type RefreshTokenDocument = Document & Omit<DatabseRefreshToken, "_id">;
 
-interface RefreshTokenModel extends Model<UserDocument> {
-  refresh(userId: string, newRefreshToken: string): Promise<void>;
-  deleteByUserId(userId: string): Promise<void>;
+interface RefreshTokenModel extends Model<RefreshTokenDocument> {
+  refresh(
+    userId: string | mongoose.Types.ObjectId,
+    newRefreshToken: string
+  ): Promise<void>;
+  deleteByUserId(userId: string | mongoose.Types.ObjectId): Promise<void>;
+  findByUserId(
+    userId: string | mongoose.Types.ObjectId
+  ): Promise<RefreshTokenDocument | undefined>;
 }
 
 const refreshTokenSchema = new Schema({
@@ -19,7 +25,10 @@ const refreshTokenSchema = new Schema({
 
 refreshTokenSchema.static(
   "refresh",
-  async function (userId: string, newRefreshToken: string) {
+  async function (
+    userId: string | mongoose.Types.ObjectId,
+    newRefreshToken: string
+  ) {
     await this.updateOne(
       { userId: new mongoose.Types.ObjectId(userId) },
       { $set: { token: newRefreshToken } }
@@ -27,9 +36,21 @@ refreshTokenSchema.static(
   }
 );
 
-refreshTokenSchema.static("deleteByUserId", async function (userId: string) {
-  await this.deleteOne({ userId: new mongoose.Types.ObjectId(userId) });
-});
+refreshTokenSchema.static(
+  "deleteByUserId",
+  async function (userId: string | mongoose.Types.ObjectId) {
+    await this.deleteOne({ userId: new mongoose.Types.ObjectId(userId) });
+  }
+);
+
+refreshTokenSchema.static(
+  "findByUserId",
+  async function (
+    userId: string | mongoose.Types.ObjectId
+  ): Promise<RefreshTokenDocument | undefined> {
+    return await this.find({ userId: new mongoose.Types.ObjectId(userId) })[0];
+  }
+);
 
 export default (models[REFRESH_TOKEN_MODEL_NAME] as RefreshTokenModel) ||
   model<RefreshTokenModel>(REFRESH_TOKEN_MODEL_NAME, refreshTokenSchema);
