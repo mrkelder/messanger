@@ -13,7 +13,6 @@ import {
   Link as MLink,
   Typography
 } from "@mui/material";
-import Head from "next/head";
 import Link from "next/link";
 
 import type {
@@ -51,10 +50,6 @@ const View: FC<TotalProps> = ({
 
   return (
     <>
-      <Head>
-        <title>{title}</title>
-      </Head>
-
       <form onSubmit={handleSubmit}>
         <Stack
           alignItems="center"
