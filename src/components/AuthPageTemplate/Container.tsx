@@ -50,4 +50,11 @@ const Container: FC<ContainerProps> = props => {
   );
 };
 
+Container.defaultProps = {
+  title: "Title",
+  buttonText: "Action",
+  linkText: "Some interesting text",
+  linkHref: "/"
+};
+
 export default Container;
