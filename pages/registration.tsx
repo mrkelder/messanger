@@ -11,7 +11,8 @@ import {
   InputLabel,
   FormControl,
   useMediaQuery,
-  Link as MLink
+  Link as MLink,
+  Typography
 } from "@mui/material";
 import { NextPage } from "next";
 import Link from "next/link";
@@ -59,6 +60,8 @@ const Registration: NextPage = () => {
           spacing={2}
         >
           <h1>Belo Chat</h1>
+
+          <Typography>Registration</Typography>
 
           <FormControl sx={{ m: 1, width: inputWidth }} variant="outlined">
             <TextField
