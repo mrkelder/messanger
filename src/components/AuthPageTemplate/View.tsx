@@ -34,7 +34,7 @@ interface ViewProps {
 
 type TotalProps = ViewProps & ContainerProps;
 
-const AuthPageTemplate: FC<TotalProps> = ({
+const View: FC<TotalProps> = ({
   isTablet,
   title,
   handleSubmit,
@@ -120,4 +120,4 @@ const AuthPageTemplate: FC<TotalProps> = ({
   );
 };
 
-export default AuthPageTemplate;
+export default View;
