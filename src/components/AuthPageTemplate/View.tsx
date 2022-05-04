@@ -13,13 +13,13 @@ import {
   Link as MLink,
   Typography
 } from "@mui/material";
-import Link from "next/link";
 
 import type {
   ContainerProps,
   FormDataState,
   HandleInputChange,
-  HandleSubmit
+  HandleSubmit,
+  HandleLinkClick
 } from "./types";
 
 interface ViewProps {
@@ -28,6 +28,7 @@ interface ViewProps {
   formData: FormDataState;
   handleSubmit: HandleSubmit;
   handleInputChange: HandleInputChange;
+  handleLinkClick: HandleLinkClick;
   handleShowPassword: () => void;
 }
 
@@ -43,7 +44,7 @@ const View: FC<TotalProps> = ({
   isPasswordShown,
   buttonText,
   linkText,
-  linkHref
+  handleLinkClick
 }) => {
   const inputWidth = isTablet ? "25ch" : "40ch";
   const buttonWidth = isTablet ? "15ch" : "25ch";
@@ -106,9 +107,7 @@ const View: FC<TotalProps> = ({
             {buttonText}
           </Button>
 
-          <Link href={linkHref} passHref>
-            <MLink>{linkText}</MLink>
-          </Link>
+          <MLink onClick={handleLinkClick}>{linkText}</MLink>
         </Stack>
       </form>
     </>

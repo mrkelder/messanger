@@ -1,12 +1,15 @@
-import { useCallback, useState, FC } from "react";
+import { useCallback, useState, FC, useContext } from "react";
 
 import { useMediaQuery } from "@mui/material";
+
+import authContext, { AuthContext } from "src/contexts/authContext";
 
 import type {
   ContainerProps,
   FormDataState,
   HandleInputChange,
-  HandleSubmit
+  HandleSubmit,
+  HandleLinkClick
 } from "./types";
 import View from "./View";
 
@@ -17,6 +20,7 @@ const defaultFormData: FormDataState = {
 
 const Container: FC<ContainerProps> = props => {
   const isTablet = useMediaQuery("(max-width: 768px)");
+  const { changePage } = useContext<AuthContext>(authContext);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [formData, setFormData] = useState(defaultFormData);
 
@@ -29,6 +33,14 @@ const Container: FC<ContainerProps> = props => {
       setFormData(prev => ({ ...prev, [field]: event.target?.value }));
     },
     []
+  );
+
+  const handleLinkClick = useCallback<HandleLinkClick>(
+    event => {
+      event.preventDefault();
+      changePage();
+    },
+    [changePage]
   );
 
   const handleSubmit = useCallback<HandleSubmit>(event => {
@@ -46,6 +58,7 @@ const Container: FC<ContainerProps> = props => {
       handleSubmit={handleSubmit}
       handleShowPassword={handleShowPassword}
       handleInputChange={handleInputChange}
+      handleLinkClick={handleLinkClick}
     />
   );
 };
@@ -53,8 +66,7 @@ const Container: FC<ContainerProps> = props => {
 Container.defaultProps = {
   title: "Title",
   buttonText: "Action",
-  linkText: "Some interesting text",
-  linkHref: "/"
+  linkText: "Some interesting text"
 };
 
 export default Container;

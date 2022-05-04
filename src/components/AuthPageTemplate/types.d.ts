@@ -2,7 +2,6 @@ export interface ContainerProps {
   title: string;
   buttonText: string;
   linkText: string;
-  linkHref: string;
 }
 
 export interface FormDataState {
@@ -15,3 +14,5 @@ export type HandleInputChange = (
 ) => (event: ChangeEvent<HTMLInputElement>) => void;
 
 export type HandleSubmit = (event: FormEvent<HTMLFormElement>) => void;
+
+export type HandleLinkClick = (event: MouseEvent<HTMLAnchorElement>) => void;
