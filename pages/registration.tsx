@@ -15,6 +15,7 @@ import {
   Typography
 } from "@mui/material";
 import { NextPage } from "next";
+import Head from "next/head";
 import Link from "next/link";
 
 interface FormDataState {
@@ -26,6 +27,8 @@ const defaultFormData: FormDataState = {
   name: "",
   password: ""
 };
+
+const TITLE = "Registration";
 
 const Registration: NextPage = () => {
   const isTablet = useMediaQuery("(max-width: 768px)");
@@ -52,6 +55,10 @@ const Registration: NextPage = () => {
 
   return (
     <>
+      <Head>
+        <title>{TITLE}</title>
+      </Head>
+
       <form onSubmit={handleSubmit}>
         <Stack
           alignItems="center"
@@ -61,7 +68,7 @@ const Registration: NextPage = () => {
         >
           <h1>Belo Chat</h1>
 
-          <Typography>Registration</Typography>
+          <Typography>{TITLE}</Typography>
 
           <FormControl sx={{ m: 1, width: inputWidth }} variant="outlined">
             <TextField
@@ -109,7 +116,7 @@ const Registration: NextPage = () => {
           </Button>
 
           <Link href="/authorization" passHref>
-            <MLink>Sign In</MLink>
+            <MLink>New here?</MLink>
           </Link>
         </Stack>
       </form>
