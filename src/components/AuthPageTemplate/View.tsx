@@ -8,10 +8,10 @@ import {
   Stack,
   InputAdornment,
   Button,
-  InputLabel,
   FormControl,
   Link as MLink,
-  Typography
+  Typography,
+  FormHelperText
 } from "@mui/material";
 
 import type {
@@ -19,13 +19,15 @@ import type {
   FormDataState,
   HandleInputChange,
   HandleSubmit,
-  HandleLinkClick
+  HandleLinkClick,
+  FormErrorState
 } from "./types";
 
 interface ViewProps {
   isTablet: boolean;
   isPasswordShown: boolean;
   formData: FormDataState;
+  formError: FormErrorState;
   handleSubmit: HandleSubmit;
   handleInputChange: HandleInputChange;
   handleLinkClick: HandleLinkClick;
@@ -39,6 +41,7 @@ const View: FC<TotalProps> = ({
   title,
   handleSubmit,
   formData,
+  formError,
   handleInputChange,
   handleShowPassword,
   isPasswordShown,
@@ -69,6 +72,12 @@ const View: FC<TotalProps> = ({
               size="small"
               value={formData.name}
               onChange={handleInputChange("name")}
+              error={formError.name}
+              helperText={
+                formError.name
+                  ? "Name has to be at least 4 characters long"
+                  : ""
+              }
             />
           </FormControl>
 
@@ -83,6 +92,7 @@ const View: FC<TotalProps> = ({
               type={isPasswordShown ? "text" : "password"}
               value={formData.password}
               onChange={handleInputChange("password")}
+              error={formError.password}
               endAdornment={
                 <InputAdornment position="end">
                   <IconButton
@@ -95,6 +105,11 @@ const View: FC<TotalProps> = ({
                 </InputAdornment>
               }
             />
+            <FormHelperText error>
+              {formError.password
+                ? "Password has to be at least 6 characters long"
+                : ""}
+            </FormHelperText>
           </FormControl>
 
           <Button type="submit" variant="contained" sx={{ width: buttonWidth }}>

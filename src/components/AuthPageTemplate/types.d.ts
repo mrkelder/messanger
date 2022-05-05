@@ -1,12 +1,13 @@
+type Fileds = "name" | "password";
+
+export type FormDataState = Record<Fileds, string>;
+
+export type FormErrorState = Record<Fileds, boolean>;
+
 export interface ContainerProps {
   title: string;
   buttonText: string;
   linkText: string;
-}
-
-export interface FormDataState {
-  name: string;
-  password: string;
 }
 
 export type HandleInputChange = (
