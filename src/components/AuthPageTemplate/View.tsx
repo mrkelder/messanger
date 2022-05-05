@@ -65,7 +65,7 @@ const View: FC<TotalProps> = ({
           <FormControl sx={{ m: 1, width: inputWidth }} variant="outlined">
             <TextField
               name="name"
-              label="Name"
+              placeholder="Name"
               size="small"
               value={formData.name}
               onChange={handleInputChange("name")}
@@ -77,16 +77,9 @@ const View: FC<TotalProps> = ({
             sx={{ m: 1, width: inputWidth }}
             variant="outlined"
           >
-            <InputLabel
-              sx={{ backgroundColor: "white", borderRight: "3px solid white" }}
-              htmlFor="outlined-adornment-password"
-            >
-              Password
-            </InputLabel>
             <OutlinedInput
               name="password"
-              id="outlined-adornment-password"
-              label="Name"
+              placeholder="Password"
               type={isPasswordShown ? "text" : "password"}
               value={formData.password}
               onChange={handleInputChange("password")}
@@ -94,7 +87,7 @@ const View: FC<TotalProps> = ({
                 <InputAdornment position="end">
                   <IconButton
                     edge="end"
-                    aria-label="toggle password visibility"
+                    aria-label="show password"
                     onClick={handleShowPassword}
                   >
                     {isPasswordShown ? <Visibility /> : <VisibilityOff />}
@@ -103,6 +96,7 @@ const View: FC<TotalProps> = ({
               }
             />
           </FormControl>
+
           <Button type="submit" variant="contained" sx={{ width: buttonWidth }}>
             {buttonText}
           </Button>
