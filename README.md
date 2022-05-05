@@ -16,6 +16,7 @@ An online messenger to chat with other users. This project is intended to demons
 - [Scripts 🚗](#scripts)
 - [Architecture 🏗](#architecture)
   - [Components ⚡](#components)
+  - [Contexts 📎](#contexts)
   - [Utilities 🔧](#utilities)
   - [Hooks ♻](#hooks)
   - [Tests 🧪](#tests)
@@ -139,6 +140,25 @@ export { default } from "./Container";
 ```
 
 Keep in mind that all component related files have to live inside of component's folder (e.g. types, hooks, unit tests etc.)
+
+### Contexts
+
+Contexts are stored in **/src/contexts** folder. Here we store context files containing context, interfaces, and types
+
+```ts
+// /src/contexts/authContext.ts
+import { createContext } from "react";
+import type { AuthContext } from "./types";
+
+interface AuthContext {
+  changePage: () => void;
+  // ...
+}
+
+const authContext = createContext<AuthContext | null>(null);
+
+export default authContext;
+```
 
 ### Utilities
 
