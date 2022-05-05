@@ -1,165 +1,76 @@
 import { screen, render, fireEvent } from "@testing-library/react";
-import axios from "axios";
-
-import Home from "pages/index";
 import "@testing-library/jest-dom";
 
-jest.mock("axios");
-
-const testUser = {
-  name: "user-name",
-  password: "user-password"
-};
+import Home from "pages/index";
 
 beforeEach(() => {
   render(<Home />);
 });
 
-describe("Regestration page", () => {
+describe("Home page", () => {
   test("Should render page with all components", () => {
-    const h1 = screen.getByText(/Authorization/i);
+    const title = screen.getByText(/Registration/i);
     const nameInput = screen.getByPlaceholderText(/Name/i);
     const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const hidePasswordCheckbox = screen.getByRole("checkbox");
-    const submitButton = screen.getByText(/Sign up/i);
-    const linkToRegistration = screen.getByText(/Sign up/i);
+    const hidePasswordButton = screen.getByLabelText(/show password/i);
+    const submitButton = screen.getByText(/Sign Up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
 
-    expect(h1).toBeInTheDocument();
+    expect(title).toBeInTheDocument();
     expect(nameInput).toBeInTheDocument();
     expect(passwordInput).toBeInTheDocument();
-    expect(hidePasswordCheckbox).toBeInTheDocument();
-    expect(submitButton).toBeInTheDocument();
-    expect(linkToRegistration).toBeInTheDocument();
-  });
-
-  test("Should warn that either the name or the password isn't correct", () => {
-    axios.post.mockImplementationOnce(() => Promise.resolve({ status: 403 }));
-
-    const nameInput = screen.getByPlaceholderText(/Name/i);
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(nameInput, { target: { value: testUser.password } });
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
-    fireEvent.click(submitButton);
-  });
-
-  test("Should reveal password", () => {
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const hidePasswordCheckbox = screen.getByRole("checkbox");
-
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
-
-    const unrevealedPasswordInput = screen.getByText(
-      testUser.password.replace(/.{1}/, "*")
-    );
-    expect(unrevealedPasswordInput).toBeInTheDocument();
-
-    fireEvent.click(hidePasswordCheckbox);
-
-    const revealedPasswordInput = screen.getByText(testUser.password);
-    expect(revealedPasswordInput).toBeInTheDocument();
-  });
-
-  test("Should warn about the empty name input", () => {
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText(/Name is empty/i));
-  });
-
-  test("Should warn about the empty password input", () => {
-    const nameInput = screen.getByPlaceholderText(/Name/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(nameInput, { target: { value: testUser.name } });
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText(/Password is empty/i));
-  });
-});
-
-describe("Regestration state", () => {
-  test("Should render page with all components", () => {
-    const h1 = screen.getByText(/Registration/i);
-    const nameInput = screen.getByPlaceholderText(/Name/i);
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const hidePasswordCheckbox = screen.getByRole("checkbox");
-    const submitButton = screen.getByText(/Sign up/i);
-    const linkToAuthorization = screen.getByText(/Sign in/i);
-
-    expect(h1).toBeInTheDocument();
-    expect(nameInput).toBeInTheDocument();
-    expect(passwordInput).toBeInTheDocument();
-    expect(hidePasswordCheckbox).toBeInTheDocument();
+    expect(hidePasswordButton).toBeInTheDocument();
     expect(submitButton).toBeInTheDocument();
     expect(linkToAuthorization).toBeInTheDocument();
   });
 
-  test("Should warn that the name is already occupied", () => {
-    axios.post.mockImplementationOnce(() => Promise.resolve({ status: 409 }));
+  test("Should change content after the link is clicked", () => {
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
+    fireEvent.click(linkToAuthorization);
+    expect(screen.getByText(/Authorization/i)).toBeInTheDocument();
 
-    const nameInput = screen.getByPlaceholderText(/Name/i);
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(nameInput, { target: { value: testUser.name } });
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
-    fireEvent.click(submitButton);
-
-    const errorMessage = screen.getByText(/This user name is already taken/i);
-    expect(errorMessage).toBeInTheDocument();
+    const linkToRegistration = screen.getByText(/Don't have an account yet?/i);
+    fireEvent.click(linkToRegistration);
+    expect(screen.getByText(/Registration/i)).toBeInTheDocument();
   });
 
-  test("Should reveal password", () => {
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const hidePasswordCheckbox = screen.getByRole("checkbox");
+  test("Should display name too short message and then hide it after page manipulations", () => {
+    const errorMessageRegExp = /Name has to be at least 4 characters long/i;
+    const passwordInput = screen.getByPlaceholderText(/Name/i);
+    const submitButton = screen.getByText(/Sign up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
 
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
+    fireEvent.change(passwordInput, { target: { value: "12" } });
+    fireEvent.click(submitButton);
+    expect(screen.getByText(errorMessageRegExp)).toBeInTheDocument();
 
-    const unrevealedPasswordInput = screen.getByText(
-      testUser.password.replace(/.{1}/, "*")
-    );
-    expect(unrevealedPasswordInput).toBeInTheDocument();
+    fireEvent.change(passwordInput, { target: { value: "122" } });
+    expect(screen.queryByText(errorMessageRegExp)).toBeNull();
 
-    fireEvent.click(hidePasswordCheckbox);
+    fireEvent.click(submitButton);
+    expect(screen.getByText(errorMessageRegExp)).toBeInTheDocument();
 
-    const revealedPasswordInput = screen.getByText(testUser.password);
-    expect(revealedPasswordInput).toBeInTheDocument();
+    fireEvent.click(linkToAuthorization);
+    expect(screen.queryByText(errorMessageRegExp)).toBeNull();
   });
 
-  test("Should warn that password is too short", () => {
-    const nameInput = screen.getByPlaceholderText(/Name/i);
+  test("Should display password too short message and then hide it after page manipulations", () => {
+    const errorMessageRegExp = /Password has to be at least 6 characters long/i;
     const passwordInput = screen.getByPlaceholderText(/Password/i);
     const submitButton = screen.getByText(/Sign up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
 
-    fireEvent.change(nameInput, { target: { value: testUser.name } });
-    fireEvent.change(passwordInput, { target: { value: "321" } });
+    fireEvent.change(passwordInput, { target: { value: "123" } });
     fireEvent.click(submitButton);
+    expect(screen.getByText(errorMessageRegExp)).toBeInTheDocument();
 
-    expect(screen.getByText(/Password is too short/i));
-  });
+    fireEvent.change(passwordInput, { target: { value: "12345" } });
+    expect(screen.queryByText(errorMessageRegExp)).toBeNull();
 
-  test("Should warn about the empty name input", () => {
-    const passwordInput = screen.getByPlaceholderText(/Password/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(passwordInput, { target: { value: testUser.password } });
     fireEvent.click(submitButton);
+    expect(screen.getByText(errorMessageRegExp)).toBeInTheDocument();
 
-    expect(screen.getByText(/Name is empty/i));
-  });
-
-  test("Should warn about the empty password input", () => {
-    const nameInput = screen.getByPlaceholderText(/Name/i);
-    const submitButton = screen.getByText(/Sign up/i);
-
-    fireEvent.change(nameInput, { target: { value: testUser.name } });
-    fireEvent.click(submitButton);
-
-    expect(screen.getByText(/Password is empty/i));
+    fireEvent.click(linkToAuthorization);
+    expect(screen.queryByText(errorMessageRegExp)).toBeNull();
   });
 });
