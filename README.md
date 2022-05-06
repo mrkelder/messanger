@@ -212,7 +212,7 @@ To see tests application in action, please follow [this link](#Development) to t
 
 ### Stories
 
-Storybook is used for screenshot testing as well as for the documentation purposes. Stories are located in **/src/stories/**. Whereas storybook config is stored in **/.storybook/** folder
+Storybook is used for screenshot testing as well as for the documentation purposes. Each story has to be located along with its component.
 
 ### Styles
 
