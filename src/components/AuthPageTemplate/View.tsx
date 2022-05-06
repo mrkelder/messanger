@@ -61,7 +61,9 @@ const View: FC<TotalProps> = ({
           height="100vh"
           spacing={2}
         >
-          <h1>Belo Chat</h1>
+          <Typography variant="h1" sx={{ fontSize: "3em", fontWeight: "bold" }}>
+            Belo Chat
+          </Typography>
 
           <Typography>{title}</Typography>
 
