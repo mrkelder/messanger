@@ -53,47 +53,33 @@ export default async function handler(
 
     private static async tryToAuthorizate() {
       if (Authorization.areCredentialsDefined())
-        await Authorization.verifyAccessToken(
-          Authorization.credentials.accessToken as string
-        );
+        await Authorization.checkIfUserExists();
       else Authorization.throwCredentialsError();
     }
 
     private static areCredentialsDefined(): boolean {
-      const { name, password, accessToken } = Authorization.credentials;
-      return !!name && !!password && !!accessToken;
+      const { name, password } = Authorization.credentials;
+      return !!name && !!password;
     }
 
     private static throwCredentialsError() {
       res.status(500).send("Some credential unspecified");
     }
 
-    private static async verifyAccessToken(accessToken: string) {
-      let _id;
-      try {
-        _id = JWT.verifyAccessToken(accessToken)._id;
-      } catch {
-        Authorization.throwAccessTokenError();
-        return;
-      }
-      await Authorization.checkIfUserExists(_id);
-    }
-
-    private static throwAccessTokenError() {
-      res.status(403).send("Access token expired");
-    }
-
-    private static async checkIfUserExists(userId: string) {
-      const foundUser = await Authorization.lookForUser(userId);
+    private static async checkIfUserExists() {
+      const foundUser = await Authorization.lookForUser();
       if (foundUser)
-        await Authorization.checkCredentials(foundUser.password, userId);
+        await Authorization.checkCredentials(
+          foundUser._id as string,
+          foundUser.password
+        );
       else this.throwUserNotFoundError();
     }
 
-    private static async lookForUser(
-      userId: string
-    ): Promise<DatabaseUser | undefined> {
-      return (await User.findById(userId)) as DatabaseUser | undefined;
+    private static async lookForUser(): Promise<DatabaseUser | undefined> {
+      return (await User.findByName(Authorization.credentials.name)) as
+        | DatabaseUser
+        | undefined;
     }
 
     private static throwUserNotFoundError() {
@@ -101,8 +87,8 @@ export default async function handler(
     }
 
     private static async checkCredentials(
-      actualPassword: string,
-      userId: string
+      userId: string,
+      actualPassword: string
     ) {
       if (await Authorization.areCredentialsEqual(actualPassword))
         await Authorization.sendSuccessResponse(userId);
