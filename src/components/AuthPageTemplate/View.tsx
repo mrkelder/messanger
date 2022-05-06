@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 
 import type {
-  ContainerProps,
+  CommonProps,
   FormDataState,
   HandleInputChange,
   HandleSubmit,
@@ -34,7 +34,7 @@ interface ViewProps {
   handleShowPassword: () => void;
 }
 
-type TotalProps = ViewProps & ContainerProps;
+type TotalProps = ViewProps & CommonProps;
 
 const View: FC<TotalProps> = ({
   isTablet,
