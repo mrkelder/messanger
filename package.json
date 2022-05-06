@@ -1,14 +1,14 @@
 {
   "name": "messenger",
-  "version": "0.3.3",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test:all": "npx jest /*.test.ts",
     "test:api": "npx jest __test__/api",
+    "test:pages": "npx jest __test__/pages --env=jsdom",
     "test:utils": "npx jest src/utils",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",

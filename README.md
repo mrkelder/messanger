@@ -16,6 +16,7 @@ An online messenger to chat with other users. This project is intended to demons
 - [Scripts 🚗](#scripts)
 - [Architecture 🏗](#architecture)
   - [Components ⚡](#components)
+  - [Contexts 📎](#contexts)
   - [Utilities 🔧](#utilities)
   - [Hooks ♻](#hooks)
   - [Tests 🧪](#tests)
@@ -140,6 +141,25 @@ export { default } from "./Container";
 
 Keep in mind that all component related files have to live inside of component's folder (e.g. types, hooks, unit tests etc.)
 
+### Contexts
+
+Contexts are stored in **/src/contexts** folder. Here we store context files containing context, interfaces, and types
+
+```ts
+// /src/contexts/authContext.ts
+import { createContext } from "react";
+import type { AuthContext } from "./types";
+
+interface AuthContext {
+  changePage: () => void;
+  // ...
+}
+
+const authContext = createContext<AuthContext | null>(null);
+
+export default authContext;
+```
+
 ### Utilities
 
 Utility functions are located in **/src/utils/** directory. Generally, utilities are organized similarly to components: the source code, tests, types are stored in the corresponding folder
@@ -192,7 +212,7 @@ To see tests application in action, please follow [this link](#Development) to t
 
 ### Stories
 
-Storybook is used for screenshot testing as well as for the documentation purposes. Stories are located in **/src/stories/**. Whereas storybook config is stored in **/.storybook/** folder
+Storybook is used for screenshot testing as well as for the documentation purposes. Each story has to be located along with its component.
 
 ### Styles
 
