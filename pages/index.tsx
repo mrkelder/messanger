@@ -12,7 +12,7 @@ import { Credentials } from "src/types/auth";
 
 const Home: NextPage = () => {
   const [isRegistration, setIsRegistration] = useState(true);
-  const [isAlertOpened, setIsAlertOpened] = useState(true);
+  const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Error message");
   const { Provider: AuthContext } = authContext;
   const title = isRegistration ? "Registration" : "Authorization";
@@ -21,26 +21,72 @@ const Home: NextPage = () => {
     ? "Have the account already?"
     : "Don't have an account yet?";
 
-  const handleAlertClose = () => {
+  const handleAlertClose = useCallback(() => {
     setIsAlertOpened(false);
+  }, []);
+
+  const setAndOpenErrorAlert = (message: string) => {
+    setErrorMessage(message);
+    setIsAlertOpened(true);
   };
 
   const registrate = useCallback(async (credentials: Credentials) => {
-    const result = await axios.post(
-      process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
-      credentials
-    );
+    try {
+      const result = await axios.post(
+        process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
+        credentials
+      );
 
-    console.log(result);
+      alert("Congrats");
+    } catch ({ response }) {
+      const { status } = response as { status: number };
+      switch (status) {
+        case 409:
+          setAndOpenErrorAlert("Such user already exists, try another name");
+          break;
+        case 500:
+          setAndOpenErrorAlert(
+            "Server error occured, try to send data once again"
+          );
+          break;
+        default:
+          setAndOpenErrorAlert(
+            "Some problem occured, try to send data once again"
+          );
+          break;
+      }
+    }
   }, []);
 
   const authorizate = useCallback(async (credentials: Credentials) => {
-    const result = await axios.post(
-      process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
-      credentials
-    );
+    try {
+      const result = await axios.post(
+        process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
+        credentials
+      );
 
-    console.log(result);
+      alert("Congrats");
+    } catch ({ response }) {
+      const { status } = response as { status: number };
+      switch (status) {
+        case 401:
+          setAndOpenErrorAlert("Password is not correct");
+          break;
+        case 404:
+          setAndOpenErrorAlert("Such user doesn't exist");
+          break;
+        case 500:
+          setAndOpenErrorAlert(
+            "Server error occured, try to send data once again"
+          );
+          break;
+        default:
+          setAndOpenErrorAlert(
+            "Some problem occured, try to send data once again"
+          );
+          break;
+      }
+    }
   }, []);
 
   const changePage = useCallback(() => {
