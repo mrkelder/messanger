@@ -7,14 +7,12 @@ import type { NextPage } from "next";
 import Head from "next/head";
 
 import AuthPageTemplate from "src/components/AuthPageTemplate";
-import authContext from "src/contexts/authContext";
 import { Credentials } from "src/types/auth";
 
 const Home: NextPage = () => {
   const [isRegistration, setIsRegistration] = useState(true);
   const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Error message");
-  const { Provider: AuthContext } = authContext;
   const title = isRegistration ? "Registration" : "Authorization";
   const buttonText = isRegistration ? "Sign Up" : "Sign In";
   const linkText = isRegistration
@@ -101,14 +99,13 @@ const Home: NextPage = () => {
         <title>{title}</title>
       </Head>
 
-      <AuthContext value={{ changePage }}>
-        <AuthPageTemplate
-          title={title}
-          buttonText={buttonText}
-          linkText={linkText}
-          callback={callback}
-        />
-      </AuthContext>
+      <AuthPageTemplate
+        title={title}
+        buttonText={buttonText}
+        linkText={linkText}
+        callback={callback}
+        changePage={changePage}
+      />
 
       <Snackbar
         open={isAlertOpened}

@@ -1,8 +1,7 @@
-import { useCallback, useState, FC, useContext } from "react";
+import { useCallback, useState, FC } from "react";
 
 import { useMediaQuery } from "@mui/material";
 
-import authContext, { AuthContext } from "src/contexts/authContext";
 import { Credentials } from "src/types/auth";
 
 import type {
@@ -27,13 +26,13 @@ const defaultFormError: FormErrorState = {
 
 interface ContainerProps {
   callback: (credentials: Credentials) => Promise<void>;
+  changePage: () => void;
 }
 
 type TotalProps = CommonProps & ContainerProps;
 
-const Container: FC<TotalProps> = ({ callback, ...props }) => {
+const Container: FC<TotalProps> = ({ callback, changePage, ...props }) => {
   const isTablet = useMediaQuery("(max-width: 768px)");
-  const { changePage } = useContext<AuthContext>(authContext);
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [formData, setFormData] = useState(defaultFormData);
   const [formError, setFormError] = useState(defaultFormError);
