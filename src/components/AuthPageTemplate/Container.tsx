@@ -62,7 +62,6 @@ const Container: FC<TotalProps> = ({ callback, ...props }) => {
   const handleSubmit = useCallback<HandleSubmit>(
     async event => {
       event.preventDefault();
-      await callback(formData);
       const nameLength = formData.name.length;
       const passwordLength = formData.password.length;
 
@@ -75,6 +74,9 @@ const Container: FC<TotalProps> = ({ callback, ...props }) => {
       if (passwordLength < 6) formErrorState.password = true;
 
       setFormError(formErrorState);
+
+      if (!formErrorState.name && !formErrorState.password)
+        await callback(formData);
     },
     [formData, callback]
   );
