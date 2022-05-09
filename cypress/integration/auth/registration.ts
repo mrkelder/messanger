@@ -9,7 +9,7 @@ describe("Registration", () => {
     });
   });
 
-  it("Should successfully sing up", () => {
+  it("Should successfully sign up", () => {
     cy.fixture("testUser").then(testUser => {
       cy.get("input[name=name]").type(testUser.name);
       cy.get("input[name=password]").type(testUser.password);
