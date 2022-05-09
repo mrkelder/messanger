@@ -3,8 +3,6 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { screen, userEvent } from "@storybook/testing-library";
 
-import authContext from "src/contexts/authContext";
-
 import AuthPageTemplate from "./index";
 
 import "styles/globals.css";
@@ -31,9 +29,7 @@ export default {
 } as ComponentMeta<typeof AuthPageTemplate>;
 
 const Template: ComponentStory<typeof AuthPageTemplate> = args => (
-  <authContext.Provider value={{ changePage: () => {} }}>
-    <AuthPageTemplate {...args} />
-  </authContext.Provider>
+  <AuthPageTemplate {...args} />
 );
 
 export const Registration = Template.bind({});
@@ -51,9 +47,7 @@ Authorization.args = {
 };
 
 export const InputErrors = Template.bind({});
-
 InputErrors.args = Registration.args;
-
 InputErrors.play = async () => {
   const nameInput = screen.getByPlaceholderText(/Name/i);
   const passwordInput = screen.getByPlaceholderText(/Password/i);
