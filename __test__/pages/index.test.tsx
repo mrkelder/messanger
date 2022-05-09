@@ -1,7 +1,10 @@
-import { screen, render, fireEvent } from "@testing-library/react";
+import { screen, render, fireEvent, act } from "@testing-library/react";
+import axios from "axios";
 import "@testing-library/jest-dom";
 
 import Home from "pages/index";
+
+jest.mock("axios");
 
 beforeEach(() => {
   render(<Home />);
@@ -36,15 +39,15 @@ describe("Home page", () => {
 
   test("Should display name too short message and then hide it after page manipulations", () => {
     const errorMessageRegExp = /Name has to be at least 4 characters long/i;
-    const passwordInput = screen.getByPlaceholderText(/Name/i);
+    const nameInput = screen.getByPlaceholderText(/Name/i);
     const submitButton = screen.getByText(/Sign up/i);
     const linkToAuthorization = screen.getByText(/Have the account already?/i);
 
-    fireEvent.change(passwordInput, { target: { value: "12" } });
+    fireEvent.change(nameInput, { target: { value: "12" } });
     fireEvent.click(submitButton);
     expect(screen.getByText(errorMessageRegExp)).toBeInTheDocument();
 
-    fireEvent.change(passwordInput, { target: { value: "122" } });
+    fireEvent.change(nameInput, { target: { value: "122" } });
     expect(screen.queryByText(errorMessageRegExp)).toBeNull();
 
     fireEvent.click(submitButton);
@@ -72,5 +75,127 @@ describe("Home page", () => {
 
     fireEvent.click(linkToAuthorization);
     expect(screen.queryByText(errorMessageRegExp)).toBeNull();
+  });
+
+  test("Should throw an error because such user already exists on registration page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 409 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+
+    await act(async () => {
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(
+      screen.getByText("Such user already exists, try another name")
+    ).toBeInTheDocument();
+  });
+
+  test("Should throw an error because of server failed response on registration page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 500 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+
+    await act(async () => {
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(
+      screen.getByText("Server error occured, try to send data once again")
+    ).toBeInTheDocument();
+  });
+
+  test("Should throw an error because of an unexpected exception on registration page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 405 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+
+    await act(async () => {
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(
+      screen.getByText("Some problem occured, try to send data once again")
+    ).toBeInTheDocument();
+  });
+
+  test("Should throw an error because the password is incorrect on authorization page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 401 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
+
+    await act(async () => {
+      await fireEvent.click(linkToAuthorization);
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(screen.getByText("Password is not correct")).toBeInTheDocument();
+  });
+
+  test("Should throw an error because the user was not found on authorization page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 404 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
+
+    await act(async () => {
+      await fireEvent.click(linkToAuthorization);
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(screen.getByText("Such user doesn't exist")).toBeInTheDocument();
+  });
+
+  test("Should throw an error because of server failed response on authorization page", async () => {
+    axios.post.mockImplementationOnce(() =>
+      Promise.reject({ response: { status: 500 } })
+    );
+
+    const nameInput = screen.getByPlaceholderText(/Name/i);
+    const passwordInput = screen.getByPlaceholderText(/Password/i);
+    const submitButton = screen.getByText(/Sign up/i);
+    const linkToAuthorization = screen.getByText(/Have the account already?/i);
+
+    await act(async () => {
+      await fireEvent.click(linkToAuthorization);
+      await fireEvent.change(nameInput, { target: { value: "123456" } });
+      await fireEvent.change(passwordInput, { target: { value: "12345678" } });
+      await fireEvent.click(submitButton);
+    });
+
+    expect(
+      screen.getByText("Server error occured, try to send data once again")
+    ).toBeInTheDocument();
   });
 });

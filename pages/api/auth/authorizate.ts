@@ -2,88 +2,136 @@ import bcrypt from "bcrypt";
 import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
+import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 import { Credentials } from "src/types/auth";
 import { DatabaseUser } from "src/types/db";
+import JWT from "src/utils/JWT";
 import RequestHelper from "src/utils/RequestHelper";
-
-class Authorization {
-  private name: string;
-  private password: string;
-  private response: NextApiResponse;
-  private foundUser: DatabaseUser | undefined;
-
-  constructor(credentials: Credentials, res: NextApiResponse) {
-    const { name, password } = credentials;
-    this.name = name;
-    this.password = password;
-    this.response = res;
-  }
-
-  public async run() {
-    if (this.areNameAndPasswordDefined()) await this.checkIfUserExists();
-    else this.throwNameOrPasswordUndefinedError();
-  }
-
-  private areNameAndPasswordDefined(): boolean {
-    return !!this.name && !!this.password;
-  }
-
-  private throwNameOrPasswordUndefinedError() {
-    this.response.status(403).send("Either name or password was not provided");
-  }
-
-  private async checkIfUserExists() {
-    await this.lookForUser();
-    if (this.foundUser) await this.checkCredentials();
-    else this.throwUserNotFoundError();
-  }
-
-  private async lookForUser() {
-    this.foundUser = (await User.findByName(this.name))[0];
-  }
-
-  private throwUserNotFoundError() {
-    this.response.status(404).send("User was not found");
-  }
-
-  private async checkCredentials() {
-    if (await this.areCredentialsEqual()) this.sendSuccessResponse();
-    else this.throwCredentialsUnequal();
-  }
-
-  public async areCredentialsEqual(): Promise<boolean> {
-    return await bcrypt.compare(
-      this.password,
-      (this.foundUser as DatabaseUser).password
-    );
-  }
-
-  public sendSuccessResponse() {
-    this.response.status(200).json(this.foundUser);
-  }
-
-  public throwCredentialsUnequal() {
-    this.response.status(403).send("Password is not correct");
-  }
-}
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse
 ) {
-  const requestHelper = new RequestHelper(req);
+  class Authorization {
+    private static requestHelper = new RequestHelper(req);
+    private static credentials: Credentials =
+      Authorization.requestHelper.getBody();
 
-  if (requestHelper.isPOST()) {
-    try {
-      const credentials = requestHelper.getBody();
-      const authorization = new Authorization(credentials, res);
-      await mongoose.connect(process.env.MONGODB_HOST as string);
-      await authorization.run();
-    } catch (err) {
-      res.status(500).send("Server could not handle the request");
-    } finally {
-      if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+    public static async run() {
+      await Authorization.checkIfPostMethod();
     }
-  } else res.status(405).send("This endpoint only accepts POST method");
+
+    private static async checkIfPostMethod() {
+      if (Authorization.isPostMethod())
+        await Authorization.connectToDbAndTryToAuthorizate();
+      else Authorization.throwWrongMethodError();
+    }
+
+    private static isPostMethod(): boolean {
+      return Authorization.requestHelper.isPOST();
+    }
+
+    private static throwWrongMethodError() {
+      res.status(405).send("This endpoint only accepts POST method");
+    }
+
+    private static async connectToDbAndTryToAuthorizate() {
+      try {
+        await mongoose.connect(process.env.MONGODB_HOST as string);
+        await Authorization.tryToAuthorizate();
+      } catch {
+        Authorization.throwServerError();
+      } finally {
+        if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+      }
+    }
+
+    private static throwServerError() {
+      res.status(500).send("Server could not handle the request");
+    }
+
+    private static async tryToAuthorizate() {
+      if (Authorization.areCredentialsDefined())
+        await Authorization.checkIfUserExists();
+      else Authorization.throwCredentialsError();
+    }
+
+    private static areCredentialsDefined(): boolean {
+      const { name, password } = Authorization.credentials;
+      return !!name && !!password;
+    }
+
+    private static throwCredentialsError() {
+      res.status(500).send("Some credential unspecified");
+    }
+
+    private static async checkIfUserExists() {
+      const foundUser = await Authorization.lookForUser();
+      if (foundUser)
+        await Authorization.checkCredentials(
+          foundUser._id as string,
+          foundUser.password
+        );
+      else this.throwUserNotFoundError();
+    }
+
+    private static async lookForUser(): Promise<DatabaseUser | undefined> {
+      return (await User.findByName(Authorization.credentials.name)) as
+        | DatabaseUser
+        | undefined;
+    }
+
+    private static throwUserNotFoundError() {
+      res.status(404).send("User not found");
+    }
+
+    private static async checkCredentials(
+      userId: string,
+      actualPassword: string
+    ) {
+      if (await Authorization.areCredentialsEqual(actualPassword))
+        await Authorization.sendSuccessResponse(userId);
+      else Authorization.throwCredentialsUnequalError();
+    }
+
+    private static async areCredentialsEqual(
+      actualPassword: string
+    ): Promise<boolean> {
+      return await bcrypt.compare(
+        Authorization.credentials.password,
+        actualPassword
+      );
+    }
+
+    private static async sendSuccessResponse(userId: string) {
+      const { accessToken, refreshToken } = await Authorization.createTokens(
+        userId
+      );
+
+      await RefreshToken.refresh(userId, refreshToken);
+
+      res
+        .setHeader(
+          "Set-Cookie",
+          `refreshToken=${refreshToken}; httpOnly; max-age=31556952`
+        )
+        .json({ accessToken });
+    }
+
+    private static async createTokens(userId: string): Promise<{
+      accessToken: string;
+      refreshToken: string;
+    }> {
+      const accessToken = JWT.createAccessToken(userId);
+      const refreshToken = JWT.createRefreshToken(userId);
+      return { accessToken, refreshToken };
+    }
+
+    private static throwCredentialsUnequalError() {
+      res.status(401).send("Password is not correct");
+    }
+  }
+
+  await Authorization.run();
 }

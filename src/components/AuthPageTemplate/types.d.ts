@@ -4,7 +4,7 @@ export type FormDataState = Record<Fileds, string>;
 
 export type FormErrorState = Record<Fileds, boolean>;
 
-export interface ContainerProps {
+export interface CommonProps {
   title: string;
   buttonText: string;
   linkText: string;
