@@ -34,6 +34,14 @@ describe("Authorization", () => {
     });
   });
 
+  it("Should reveal and hide password", () => {
+    cy.get("input[name=password]").should("have.attr", "type", "password");
+    cy.get("input[name=password] ~ div > button").click();
+    cy.get("input[name=password]").should("have.attr", "type", "text");
+    cy.get("input[name=password] ~ div > button").click();
+    cy.get("input[name=password]").should("have.attr", "type", "password");
+  });
+
   it("Should successfully sign in", () => {
     cy.fixture("testUser").then(testUser => {
       cy.get("input[name=name]").type(testUser.name);
