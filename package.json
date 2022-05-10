@@ -1,6 +1,6 @@
 {
   "name": "messenger",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -8,8 +8,10 @@
     "start": "next start",
     "lint": "next lint",
     "test:api": "npx jest __test__/api",
-    "test:pages": "npx jest __test__/pages --env=jsdom",
     "test:utils": "npx jest src/utils",
+    "test:pages": "npx jest __test__/pages --env=jsdom",
+    "test:components": "npx jest src/components --env=jsdom",
+    "test:all": "npm run test:api & npm run test:utils & npm run test:pages & npm run test:components",
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
     "chromatic": "npx chromatic --project-token=1c8a3f81c93b",
