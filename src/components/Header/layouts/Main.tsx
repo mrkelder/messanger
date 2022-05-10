@@ -10,7 +10,7 @@ type TotalProps = Pick<ViewProps, "toggleDrawer">;
 const Main: FC<TotalProps> = ({ toggleDrawer }) => {
   return (
     <>
-      <IconButton color="inherit" onClick={toggleDrawer}>
+      <IconButton color="inherit" onClick={toggleDrawer} aria-label="open nav">
         <Menu fontSize="medium" />
       </IconButton>
 

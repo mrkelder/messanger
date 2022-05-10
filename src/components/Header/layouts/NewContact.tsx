@@ -6,7 +6,7 @@ import { IconButton, Typography } from "@mui/material";
 const Chat: FC = () => {
   return (
     <>
-      <IconButton color="inherit">
+      <IconButton color="inherit" arial-label="back">
         <ArrowBack fontSize="medium" />
       </IconButton>
 

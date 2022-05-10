@@ -57,7 +57,7 @@ const View: FC<TotalProps> = ({
           <Divider />
 
           <Stack marginTop="10px" gap="5px">
-            <ButtonBase sx={{ height: "35px" }}>
+            <ButtonBase sx={{ height: "35px" }} aria-label="new contact">
               <Stack alignItems="center" direction="row" sx={{ width: "100%" }}>
                 <ContactsRounded
                   fontSize="small"
@@ -67,7 +67,7 @@ const View: FC<TotalProps> = ({
               </Stack>
             </ButtonBase>
 
-            <ButtonBase sx={{ height: "35px" }}>
+            <ButtonBase sx={{ height: "35px" }} aria-label="settings">
               <Stack alignItems="center" direction="row" sx={{ width: "100%" }}>
                 <Settings
                   fontSize="small"
@@ -77,7 +77,11 @@ const View: FC<TotalProps> = ({
               </Stack>
             </ButtonBase>
 
-            <ButtonBase sx={{ height: "35px" }} onClick={toggleNightMode}>
+            <ButtonBase
+              sx={{ height: "35px" }}
+              onClick={toggleNightMode}
+              aria-label="night mode"
+            >
               <Stack alignItems="center" direction="row" sx={{ width: "100%" }}>
                 <DarkMode
                   fontSize="small"
