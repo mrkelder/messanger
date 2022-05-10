@@ -3,7 +3,8 @@ import React from "react";
 import { ComponentStory, ComponentMeta } from "@storybook/react";
 import { screen, userEvent } from "@storybook/testing-library";
 
-import Header from "src/components/Header";
+import Header from "./index";
+
 import "styles/globals.css";
 
 export default {
