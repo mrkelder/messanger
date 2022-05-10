@@ -1,35 +1,29 @@
 import { FC } from "react";
 
-import {
-  ContactsRounded,
-  DarkMode,
-  Menu,
-  Search,
-  Settings
-} from "@mui/icons-material";
+import { ContactsRounded, DarkMode, Settings } from "@mui/icons-material";
 import {
   Avatar,
   ButtonBase,
   Divider,
   Drawer,
-  IconButton,
   Stack,
   Switch,
   Typography
 } from "@mui/material";
 
-interface Props {
-  isDrawerOpened: boolean;
-  isNightMode: boolean;
-  toggleDrawer: () => void;
-  toggleNightMode: () => void;
-}
+import Chat from "./layouts/Chat";
+import Main from "./layouts/Main";
+import NewContact from "./layouts/NewContact";
+import { CommonProps, ViewProps } from "./types";
 
-const View: FC<Props> = ({
+type TotalProps = ViewProps & CommonProps;
+
+const View: FC<TotalProps> = ({
   isDrawerOpened,
   isNightMode,
   toggleDrawer,
-  toggleNightMode
+  toggleNightMode,
+  variant
 }) => {
   return (
     <>
@@ -43,22 +37,9 @@ const View: FC<Props> = ({
         alignItems="center"
         direction="row"
       >
-        <IconButton color="inherit" onClick={toggleDrawer}>
-          <Menu fontSize="medium" />
-        </IconButton>
-
-        <Typography
-          variant="h1"
-          fontSize="1.1em"
-          color="inherit"
-          fontWeight="bold"
-        >
-          Belo Chat
-        </Typography>
-
-        <IconButton sx={{ ml: "auto" }} color="inherit">
-          <Search fontSize="medium" />
-        </IconButton>
+        {variant === "main" && <Main toggleDrawer={toggleDrawer} />}
+        {variant === "chat" && <Chat />}
+        {variant === "new-contact" && <NewContact />}
       </Stack>
 
       <Drawer open={isDrawerOpened} onClose={toggleDrawer}>

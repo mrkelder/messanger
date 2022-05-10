@@ -1,8 +1,9 @@
 import { FC, useCallback, useState } from "react";
 
+import { CommonProps } from "./types";
 import View from "./View";
 
-const Container: FC = () => {
+const Container: FC<CommonProps> = ({ variant }) => {
   const [isDrawerOpened, setIsDrawerOpened] = useState(false);
   const [isNightMode, setIsNightMode] = useState(false);
 
@@ -20,8 +21,13 @@ const Container: FC = () => {
       isNightMode={isNightMode}
       toggleDrawer={toggleDrawer}
       toggleNightMode={toggleNightMode}
+      variant={variant}
     />
   );
+};
+
+Container.defaultProps = {
+  variant: "main"
 };
 
 export default Container;
