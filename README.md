@@ -65,8 +65,9 @@ To run a script use `npm run <script_name>` construction. Here's a list of all a
 - **build-storybook** - builds a storybook static documentation page
 - **chromatic** - performs screenshot tests by sending screenshots to chromatic service
 - **cypress:open** - calls up cypress testing environment window
-- **test:all** - runs all \*.test.ts(x) files
+- **test:all** - runs all the **test:\*** scripts listed below
 - **test:utils** - runs all tests in **src/utils** directory
+- **test:components** - runs all tests in **src/components** directory
 - **test:api** - runs all tests in **\_\_test\_\_/api** directory
 
 ## Architecture
