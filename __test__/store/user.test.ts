@@ -12,7 +12,7 @@ const userName = "MR. Paladin";
 
 describe("User reducer", () => {
   test("Should return the initial value", () => {
-    expect(reducer(undefined, {})).toEqual(initState);
+    expect(reducer(undefined, { type: "" })).toEqual(initState);
   });
 
   test("Should assign access token", () => {
