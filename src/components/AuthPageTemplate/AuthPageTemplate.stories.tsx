@@ -25,6 +25,12 @@ const argTypes = {
 export default {
   title: "AuthPageTemplate",
   component: AuthPageTemplate,
+  parameters: {
+    layout: "fullscreen",
+    chromatic: {
+      viewports: [320, 768, 1024]
+    }
+  },
   argTypes
 } as ComponentMeta<typeof AuthPageTemplate>;
 
