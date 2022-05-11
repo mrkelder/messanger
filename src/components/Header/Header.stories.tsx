@@ -11,7 +11,10 @@ export default {
   title: "Header",
   component: Header,
   parameters: {
-    layout: "fullscreen"
+    layout: "fullscreen",
+    chromatic: {
+      viewports: [320, 768, 1024]
+    }
   },
   decorators: [
     Story => (
