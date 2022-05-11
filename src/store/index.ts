@@ -1,9 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import defaultReducer from "./reducers/defaultReducer";
+import userReducer from "./reducers/user";
 
 const reducer = {
-  default: defaultReducer
+  user: userReducer
 };
 
 const store = configureStore({
@@ -12,3 +12,7 @@ const store = configureStore({
 });
 
 export default store;
+
+export type RootState = ReturnType<typeof store.getState>;
+
+export type AppDispatch = typeof store.dispatch;
