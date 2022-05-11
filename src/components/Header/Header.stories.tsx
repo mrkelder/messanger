@@ -9,7 +9,17 @@ import "styles/globals.css";
 
 export default {
   title: "Header",
-  component: Header
+  component: Header,
+  parameters: {
+    layout: "fullscreen"
+  },
+  decorators: [
+    Story => (
+      <div style={{ height: "100vh" }}>
+        <Story />
+      </div>
+    )
+  ]
 } as ComponentMeta<typeof Header>;
 
 const Template: ComponentStory<typeof Header> = args => <Header {...args} />;
