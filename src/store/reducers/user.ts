@@ -6,7 +6,7 @@ interface UserData {
 
 const initialState = {
   accessToken: "",
-  info: {
+  userData: {
     userName: ""
   }
 };
@@ -19,7 +19,7 @@ const userSlice = createSlice({
       state.accessToken = action.payload;
     },
     setUserData(state, action: PayloadAction<UserData>) {
-      state.info.userName = action.payload.userName;
+      state.userData.userName = action.payload.userName;
     }
   }
 });
