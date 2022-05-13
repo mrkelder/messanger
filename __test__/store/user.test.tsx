@@ -34,7 +34,7 @@ describe("User reducer", () => {
   });
 
   test("Should load user's data", () => {
-    expect(reducer(undefined, setUserData(userName))).toEqual({
+    expect(reducer(undefined, setUserData({ userName }))).toEqual({
       ...initState,
       info: { userName }
     });

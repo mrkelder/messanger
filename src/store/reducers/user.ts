@@ -1,5 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
+interface UserData {
+  userName: string;
+}
+
 const initialState = {
   accessToken: "",
   info: {
@@ -14,8 +18,8 @@ const userSlice = createSlice({
     setAccessToken(state, action: PayloadAction<string>) {
       state.accessToken = action.payload;
     },
-    setUserData(state, action: PayloadAction<string>) {
-      state.info.userName = action.payload;
+    setUserData(state, action: PayloadAction<UserData>) {
+      state.info.userName = action.payload.userName;
     }
   }
 });
