@@ -1,4 +1,5 @@
 import { screen, render } from "@testing-library/react";
+
 import M from "pages/m";
 
 describe("Main page", () => {
