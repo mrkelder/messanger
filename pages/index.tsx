@@ -5,11 +5,16 @@ import { Alert, IconButton, Snackbar, Stack, Typography } from "@mui/material";
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
 
 import AuthPageTemplate from "src/components/AuthPageTemplate";
+import { setAccessToken, setUserData } from "src/store/reducers/userReducer";
 import { Credentials } from "src/types/auth";
 
 const Home: NextPage = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
   const [isRegistration, setIsRegistration] = useState(true);
   const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Error message");
@@ -28,64 +33,76 @@ const Home: NextPage = () => {
     setIsAlertOpened(true);
   };
 
-  const registrate = useCallback(async (credentials: Credentials) => {
-    try {
-      const result = await axios.post(
-        process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
-        credentials
-      );
+  // TODO: the functions listed below should make submit buttons disabled until the response is retrieved
 
-      alert("Congrats");
-    } catch ({ response }) {
-      const { status } = response as { status: number };
-      switch (status) {
-        case 409:
-          setAndOpenErrorAlert("Such user already exists, try another name");
-          break;
-        case 500:
-          setAndOpenErrorAlert(
-            "Server error occured, try to send data once again"
-          );
-          break;
-        default:
-          setAndOpenErrorAlert(
-            "Some problem occured, try to send data once again"
-          );
-          break;
+  const registrate = useCallback(
+    async (credentials: Credentials) => {
+      try {
+        const { data } = await axios.post(
+          process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
+          credentials
+        );
+
+        dispatch(setAccessToken(data.accessToken as string));
+        dispatch(setUserData({ userName: credentials.name }));
+        router.push("/m");
+      } catch ({ response }) {
+        const { status } = response as { status: number };
+        switch (status) {
+          case 409:
+            setAndOpenErrorAlert("Such user already exists, try another name");
+            break;
+          case 500:
+            setAndOpenErrorAlert(
+              "Server error occured, try to send data once again"
+            );
+            break;
+          default:
+            setAndOpenErrorAlert(
+              "Some problem occured, try to send data once again"
+            );
+            break;
+        }
       }
-    }
-  }, []);
+    },
+    [dispatch, router]
+  );
 
-  const authorizate = useCallback(async (credentials: Credentials) => {
-    try {
-      const result = await axios.post(
-        process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
-        credentials
-      );
+  const authorizate = useCallback(
+    async (credentials: Credentials) => {
+      try {
+        const { data } = await axios.post(
+          process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
+          credentials
+        );
 
-      alert("Congrats");
-    } catch ({ response }) {
-      const { status } = response as { status: number };
-      switch (status) {
-        case 401:
-          setAndOpenErrorAlert("Password is not correct");
-          break;
-        case 404:
-          setAndOpenErrorAlert("Such user doesn't exist");
-          break;
-        case 500:
-          setAndOpenErrorAlert(
-            "Server error occured, try to send data once again"
-          );
-          break;
-        default:
-          setAndOpenErrorAlert(
-            "Some problem occured, try to send data once again"
-          );
-          break;
+        dispatch(setAccessToken(data.accessToken as string));
+        dispatch(setUserData({ userName: credentials.name }));
+        router.push("/m");
+      } catch ({ response }) {
+        const { status } = response as { status: number };
+        switch (status) {
+          case 401:
+            setAndOpenErrorAlert("Password is not correct");
+            break;
+          case 404:
+            setAndOpenErrorAlert("Such user doesn't exist");
+            break;
+          case 500:
+            setAndOpenErrorAlert(
+              "Server error occured, try to send data once again"
+            );
+            break;
+          default:
+            setAndOpenErrorAlert(
+              "Some problem occured, try to send data once again"
+            );
+            break;
+        }
       }
-    }
-  }, []);
+    },
+    [dispatch, router]
+  );
 
   const changePage = useCallback(() => {
     setIsRegistration(prev => !prev);
