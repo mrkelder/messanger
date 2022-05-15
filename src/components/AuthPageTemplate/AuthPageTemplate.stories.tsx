@@ -19,6 +19,9 @@ const argTypes = {
   linkText: {
     options: ["Have the account already?", "Don't have an account yet?"],
     control: { type: "select" }
+  },
+  isSubmitDisabled: {
+    control: "boolean"
   }
 };
 
@@ -42,14 +45,16 @@ export const Registration = Template.bind({});
 Registration.args = {
   title: argTypes.title.options[0],
   buttonText: argTypes.buttonText.options[0],
-  linkText: argTypes.linkText.options[0]
+  linkText: argTypes.linkText.options[0],
+  isSubmitDisabled: false
 };
 
 export const Authorization = Template.bind({});
 Authorization.args = {
   title: argTypes.title.options[1],
   buttonText: argTypes.buttonText.options[1],
-  linkText: argTypes.linkText.options[1]
+  linkText: argTypes.linkText.options[1],
+  isSubmitDisabled: false
 };
 
 export const InputErrors = Template.bind({});
@@ -63,4 +68,12 @@ InputErrors.play = async () => {
   await userEvent.type(passwordInput, "12345");
   await userEvent.click(submitButton);
   await userEvent.unhover(submitButton);
+};
+
+export const DisabledSubmit = Template.bind({});
+DisabledSubmit.args = {
+  title: argTypes.title.options[0],
+  buttonText: argTypes.buttonText.options[0],
+  linkText: argTypes.linkText.options[0],
+  isSubmitDisabled: true
 };
