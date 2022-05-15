@@ -1,29 +1,5 @@
 import LocalStorage from "./index";
 
-class BrowserLocalStorage {
-  private store: { [key: string]: string };
-
-  constructor() {
-    this.store = {};
-  }
-
-  clear() {
-    this.store = {};
-  }
-
-  getItem(key: string) {
-    return this.store[key] || null;
-  }
-
-  setItem(key: string, value: string) {
-    this.store[key] = value;
-  }
-
-  removeItem(key: string) {
-    delete this.store[key];
-  }
-}
-
 interface Item {
   type: string;
   name: string;
@@ -50,8 +26,8 @@ describe("LocalStorage class", () => {
     LocalStorage.set("item", item);
     expect(LocalStorage.get<Item>("item")).toEqual(item);
 
-    const deletedItem = LocalStorage<Item>("item");
-    expect(deletedItem).toEqual(item);
+    LocalStorage.remove("item");
+    expect(LocalStorage.get<Item>("item")).toBeNull();
   });
 
   test("Should clear the localStorage", () => {
