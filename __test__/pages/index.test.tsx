@@ -8,6 +8,8 @@ import store from "src/store";
 
 jest.mock("axios");
 
+const mockedAxios = axios as jest.Mocked<typeof axios>;
+
 beforeEach(() => {
   render(
     <Provider store={store}>
@@ -84,7 +86,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because such user already exists on registration page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 409 } })
     );
 
@@ -104,7 +106,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because of server failed response on registration page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 500 } })
     );
 
@@ -124,7 +126,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because of an unexpected exception on registration page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 405 } })
     );
 
@@ -144,7 +146,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because the password is incorrect on authorization page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 401 } })
     );
 
@@ -164,7 +166,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because the user was not found on authorization page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 404 } })
     );
 
@@ -184,7 +186,7 @@ describe("Home page", () => {
   });
 
   test("Should throw an error because of server failed response on authorization page", async () => {
-    axios.post.mockImplementationOnce(() =>
+    mockedAxios.post.mockImplementationOnce(() =>
       Promise.reject({ response: { status: 500 } })
     );
 
