@@ -1,13 +1,19 @@
 import { screen, render, fireEvent, act } from "@testing-library/react";
-import axios from "axios";
 import "@testing-library/jest-dom";
+import axios from "axios";
+import { Provider } from "react-redux";
 
 import Home from "pages/index";
+import store from "src/store";
 
 jest.mock("axios");
 
 beforeEach(() => {
-  render(<Home />);
+  render(
+    <Provider store={store}>
+      <Home />
+    </Provider>
+  );
 });
 
 describe("Home page", () => {
