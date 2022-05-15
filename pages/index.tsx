@@ -15,6 +15,7 @@ import { Credentials } from "src/types/auth";
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   const [isRegistration, setIsRegistration] = useState(true);
   const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [errorMessage, setErrorMessage] = useState("Error message");
@@ -38,6 +39,7 @@ const Home: NextPage = () => {
   const registrate = useCallback(
     async (credentials: Credentials) => {
       try {
+        setIsSubmitDisabled(true);
         const { data } = await axios.post(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
           credentials
@@ -47,6 +49,7 @@ const Home: NextPage = () => {
         dispatch(setUserData({ userName: credentials.name }));
         router.push("/m");
       } catch ({ response }) {
+        setIsSubmitDisabled(false);
         const { status } = response as { status: number };
         switch (status) {
           case 409:
@@ -71,6 +74,7 @@ const Home: NextPage = () => {
   const authorizate = useCallback(
     async (credentials: Credentials) => {
       try {
+        setIsSubmitDisabled(true);
         const { data } = await axios.post(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
           credentials
@@ -80,6 +84,7 @@ const Home: NextPage = () => {
         dispatch(setUserData({ userName: credentials.name }));
         router.push("/m");
       } catch ({ response }) {
+        setIsSubmitDisabled(false);
         const { status } = response as { status: number };
         switch (status) {
           case 401:
@@ -122,6 +127,7 @@ const Home: NextPage = () => {
         linkText={linkText}
         callback={callback}
         changePage={changePage}
+        isSubmitDisabled={isSubmitDisabled}
       />
 
       <Snackbar

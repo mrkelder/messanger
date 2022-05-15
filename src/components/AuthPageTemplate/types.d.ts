@@ -8,6 +8,7 @@ export interface CommonProps {
   title: string;
   buttonText: string;
   linkText: string;
+  isSubmitDisabled: boolean;
 }
 
 export type HandleInputChange = (

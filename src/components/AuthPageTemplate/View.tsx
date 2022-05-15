@@ -47,7 +47,8 @@ const View: FC<TotalProps> = ({
   isPasswordShown,
   buttonText,
   linkText,
-  handleLinkClick
+  handleLinkClick,
+  isSubmitDisabled
 }) => {
   const inputWidth = isTablet ? "25ch" : "40ch";
   const buttonWidth = isTablet ? "15ch" : "25ch";
@@ -114,7 +115,12 @@ const View: FC<TotalProps> = ({
             </FormHelperText>
           </FormControl>
 
-          <Button type="submit" variant="contained" sx={{ width: buttonWidth }}>
+          <Button
+            type="submit"
+            disabled={isSubmitDisabled}
+            variant="contained"
+            sx={{ width: buttonWidth }}
+          >
             {buttonText}
           </Button>
 
