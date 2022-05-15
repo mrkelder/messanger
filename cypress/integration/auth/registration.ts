@@ -17,17 +17,21 @@ describe("Registration", () => {
     cy.get("input[name=password]").should("have.attr", "type", "password");
   });
 
-  it("Should successfully sign up", () => {
+  it("Should successfully sign up and redirect to the main page", () => {
     cy.fixture("testUser").then(testUser => {
       cy.get("input[name=name]").type(testUser.name);
       cy.get("input[name=password]").type(testUser.password);
       cy.contains("Sign Up").click();
       cy.wait(3000);
+      cy.contains("Belo Chat");
     });
   });
 
   it("Should throw an error because such user already exists", () => {
     cy.fixture("testUser").then(testUser => {
+      cy.visit("/");
+      cy.get("input[name=name]").type(testUser.name);
+      cy.get("input[name=password]").type(testUser.password);
       cy.contains("Sign Up").click();
       cy.contains("Such user already exists, try another name");
       cy.task("db:deleteUser", testUser.name);
