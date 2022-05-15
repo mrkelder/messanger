@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test:api": "npx jest __test__/api",
+    "test:store": "npx jest __test__/store --env=jsdom",
     "test:utils": "npx jest src/utils",
     "test:pages": "npx jest __test__/pages --env=jsdom",
     "test:components": "npx jest src/components --env=jsdom",
