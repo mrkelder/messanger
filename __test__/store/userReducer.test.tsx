@@ -5,6 +5,7 @@ import reducer, {
   setUserData,
   initStoreFromLocalStorage
 } from "src/store/reducers/userReducer";
+import LocalStorage from "src/utils/LocalStorage";
 
 jest.mock("axios");
 
@@ -46,8 +47,13 @@ describe("User reducer", () => {
 });
 
 describe("User reducer with localStorage", () => {
+  beforeEach(() => {
+    store.dispatch(setAccessToken(initState.accessToken));
+    store.dispatch(setUserData(initState.userData));
+  });
+
   test("Should remain the same state because of the invalid user data", () => {
-    localStorage.setItem(
+    LocalStorage.set(
       USER_DATA_LOCAL_STORAGE_NAME,
       JSON.stringify({ accessToken: localStorageState.accessToken })
     );
@@ -57,7 +63,7 @@ describe("User reducer with localStorage", () => {
   });
 
   test("Should remain the same state because of the invalid access token", () => {
-    localStorage.setItem(
+    LocalStorage.set(
       USER_DATA_LOCAL_STORAGE_NAME,
       JSON.stringify({ userData: localStorageState.userData })
     );
@@ -72,12 +78,31 @@ describe("User reducer with localStorage", () => {
   });
 
   test("Should initiate store from localStorage", () => {
-    localStorage.setItem(
-      USER_DATA_LOCAL_STORAGE_NAME,
-      JSON.stringify(localStorageState)
-    );
+    LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, localStorageState);
 
     store.dispatch(initStoreFromLocalStorage());
     expect(store.getState().user).toEqual(localStorageState);
+  });
+
+  test("Should add accessToken to localStorage", () => {
+    store.dispatch(setAccessToken(localStorageState.accessToken));
+
+    expect(
+      LocalStorage.get<typeof localStorageState>(USER_DATA_LOCAL_STORAGE_NAME)
+    ).toEqual({
+      accessToken: localStorageState.accessToken,
+      userData: initState.userData
+    });
+  });
+
+  test("Should add userData to localStorage", () => {
+    store.dispatch(setUserData(localStorageState.userData));
+
+    expect(
+      LocalStorage.get<typeof localStorageState>(USER_DATA_LOCAL_STORAGE_NAME)
+    ).toEqual({
+      accessToken: initState.accessToken,
+      userData: localStorageState.userData
+    });
   });
 });
