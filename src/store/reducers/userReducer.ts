@@ -36,6 +36,10 @@ const userSlice = createSlice({
       if (accessToken && userData && userData.userName) {
         state.accessToken = accessToken;
         state.userData.userName = userData.userName;
+      } else {
+        state.accessToken = initialState.accessToken;
+        state.userData = initialState.userData;
+        LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, state);
       }
     }
   }
