@@ -1,1 +1,1 @@
-export const USER_DATA_LOCAL_STORAGE_NAME = "userData0";
+export const USER_DATA_LOCAL_STORAGE_NAME = "userData";
