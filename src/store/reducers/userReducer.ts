@@ -9,42 +9,32 @@ interface UserData {
 }
 
 const initialState = {
-  accessToken: "",
-  userData: {
-    userName: ""
-  }
+  userName: ""
 };
 
 const userSlice = createSlice({
   name: "user",
   initialState,
   reducers: {
-    setAccessToken(state, action: PayloadAction<string>) {
-      state.accessToken = action.payload;
-      LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, state);
-    },
-    setUserData(state, action: PayloadAction<UserData>) {
-      state.userData.userName = action.payload.userName;
+    setUserData(state, { payload }: PayloadAction<UserData>) {
+      state.userName = payload.userName;
       LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, state);
     },
     initStoreFromLocalStorage(state) {
       const data = LocalStorage.get<typeof initialState>(
         USER_DATA_LOCAL_STORAGE_NAME
       );
-      const { accessToken, userData } = data ?? {};
+      const { userName } = data ?? {};
 
-      if (accessToken && userData && userData.userName) {
-        state.accessToken = accessToken;
-        state.userData.userName = userData.userName;
+      if (userName) {
+        state.userName = userName;
       } else {
-        state.accessToken = initialState.accessToken;
-        state.userData = initialState.userData;
+        state = initialState;
         LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, state);
       }
     }
   }
 });
 
-export const { setAccessToken, setUserData, initStoreFromLocalStorage } =
-  userSlice.actions;
+export const { setUserData, initStoreFromLocalStorage } = userSlice.actions;
 export default userSlice.reducer;
