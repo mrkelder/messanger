@@ -9,7 +9,7 @@ import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 
 import AuthPageTemplate from "src/components/AuthPageTemplate";
-import { setAccessToken, setUserData } from "src/store/reducers/userReducer";
+import { setUserData } from "src/store/reducers/userReducer";
 import { Credentials } from "src/types/auth";
 
 const Home: NextPage = () => {
@@ -34,6 +34,11 @@ const Home: NextPage = () => {
     setIsAlertOpened(true);
   };
 
+  const saveAccessTokenInCookies = (accessToken: string) => {
+    // FIXME: add "domain" field e.g. domain=messenger.proga.site
+    document.cookie = `accessToken=${accessToken}; path=*; max-age=60*60*24*30`;
+  };
+
   const registrate = useCallback(
     async (credentials: Credentials) => {
       try {
@@ -43,7 +48,7 @@ const Home: NextPage = () => {
           credentials
         );
 
-        dispatch(setAccessToken(data.accessToken as string));
+        saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name }));
         router.push("/m");
       } catch ({ response }) {
@@ -78,7 +83,7 @@ const Home: NextPage = () => {
           credentials
         );
 
-        dispatch(setAccessToken(data.accessToken as string));
+        saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name }));
         router.push("/m");
       } catch ({ response }) {
