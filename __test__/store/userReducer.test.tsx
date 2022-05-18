@@ -59,7 +59,7 @@ describe("User reducer with localStorage", () => {
     expect(
       LocalStorage.get<typeof localStorageState>(USER_DATA_LOCAL_STORAGE_NAME)
     ).toEqual({
-      userData: localStorageState
+      ...localStorageState
     });
   });
 });
