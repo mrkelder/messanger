@@ -34,8 +34,6 @@ const Home: NextPage = () => {
     setIsAlertOpened(true);
   };
 
-  // TODO: the functions listed below should make submit buttons disabled until the response is retrieved
-
   const registrate = useCallback(
     async (credentials: Credentials) => {
       try {
