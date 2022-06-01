@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
+import { Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Header from "src/components/Header";
+import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -13,6 +15,35 @@ interface Props {
 
 const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
+  const [chats, setChats] = useState<Chat[]>([]);
+  const [areChatsLoaded, setAreChatsLoaded] = useState(false);
+
+  useEffect(() => {
+    async function fetchChats() {
+      // TODO: fetching stuff
+      const chat: Chat = {
+        _id: "624182e7f85bf6faab957ff4",
+        name: "Chat ",
+        lastMessage: {
+          author: "You",
+          createdAt: 1654066536414,
+          text: "What's up?",
+          _id: "c24dh2e7f85bf2f24bq57sb4"
+        },
+        updatedAt: 1654066536414
+      };
+
+      setTimeout(() => {
+        const data: Chat[] = new Array(5)
+          .fill(null)
+          .map((_, index) => ({ ...chat, name: chat.name + (index + 1) }));
+        setAreChatsLoaded(true);
+        setChats(data);
+      }, 3000);
+    }
+
+    if (isAccessTokenValid) fetchChats();
+  }, [isAccessTokenValid]);
 
   useEffect(() => {
     async function handler() {
@@ -34,6 +65,22 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   return (
     <>
       <Header />
+
+      {!areChatsLoaded ? (
+        <>
+          <Typography>Loading your chats...</Typography>
+        </>
+      ) : (
+        <>
+          {chats.length === 0 && <Typography>You have no chats</Typography>}
+
+          <Stack>
+            {chats.map(i => (
+              <p key={i.name}>{i.name}</p>
+            ))}
+          </Stack>
+        </>
+      )}
     </>
   );
 };
@@ -44,6 +91,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
     private static returnConfig: GetServerSidePropsResult<Props>;
 
     public static returnTotalConfig(): GetServerSidePropsResult<Props> {
+      // FIXME: rename checkAccessToken because returnTotalConfig lies otherwise
       SSRHandler.checkAccessToken();
       return SSRHandler.returnConfig;
     }
