@@ -3,7 +3,7 @@ import { useState, useCallback } from "react";
 import { Close } from "@mui/icons-material";
 import { Alert, IconButton, Snackbar, Stack, Typography } from "@mui/material";
 import axios from "axios";
-import type { NextPage } from "next";
+import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
@@ -157,6 +157,14 @@ const Home: NextPage = () => {
       </Snackbar>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async context => {
+  const { accessToken } = context.req.cookies;
+
+  if (accessToken) return { redirect: { destination: "/m", permanent: false } };
+
+  return { props: {} };
 };
 
 export default Home;
