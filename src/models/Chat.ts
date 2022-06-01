@@ -20,8 +20,7 @@ const chatSchema = new Schema(
     ],
     lastMessage: {
       type: mongoose.Types.ObjectId,
-      ref: MESSAGE_MODEL_NAME,
-      required: true
+      ref: MESSAGE_MODEL_NAME
     }
   },
   {

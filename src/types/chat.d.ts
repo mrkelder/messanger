@@ -6,5 +6,5 @@ export type Message = Omit<DatabaseMessage, "author"> & {
 
 export type Chat = Omit<DatabaseChat, "members" | "lastMessage"> & {
   peerName: string;
-  lastMessage: Message;
+  lastMessage?: Message;
 };

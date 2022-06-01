@@ -21,7 +21,7 @@ export interface DatabaseMessage {
 export interface DatabaseChat {
   _id?: string;
   members: Omit<DatabaseUser, "password">[];
-  lastMessage: DatabaseMessage;
+  lastMessage?: DatabaseMessage;
   createdAt: string;
   updatedAt: string;
 }
