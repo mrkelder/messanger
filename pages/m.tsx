@@ -6,7 +6,7 @@ import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Header from "src/components/Header";
-import { Chat } from "src/types/db";
+import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -23,20 +23,21 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
       // TODO: fetching stuff
       const chat: Chat = {
         _id: "624182e7f85bf6faab957ff4",
-        name: "Chat ",
+        peerName: "User 2",
         lastMessage: {
-          author: "You",
-          createdAt: 1654066536414,
+          author: "User 1",
           text: "What's up?",
-          _id: "c24dh2e7f85bf2f24bq57sb4"
+          createdAt: "2022-06-01T08:13:47.504+00:00",
+          updatedAt: "2022-06-01T08:13:47.504+00:00"
         },
-        updatedAt: 1654066536414
+        createdAt: "2022-05-01T08:13:47.504+00:00",
+        updatedAt: "2022-06-01T08:13:47.504+00:00"
       };
 
       setTimeout(() => {
         const data: Chat[] = new Array(5)
           .fill(null)
-          .map((_, index) => ({ ...chat, name: chat.name + (index + 1) }));
+          .map((_, index) => ({ ...chat, name: chat.peerName + (index + 1) }));
         setAreChatsLoaded(true);
         setChats(data);
       }, 3000);
@@ -48,6 +49,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   useEffect(() => {
     async function handler() {
       try {
+        // FIXME: refreshToken does NOT work
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
         );
@@ -76,7 +78,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
           <Stack>
             {chats.map(i => (
-              <p key={i.name}>{i.name}</p>
+              <p key={i.peerName}>{i.peerName}</p>
             ))}
           </Stack>
         </>

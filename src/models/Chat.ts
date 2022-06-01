@@ -1,15 +1,28 @@
 import mongoose, { Schema, model, models, Model } from "mongoose";
 
-import { Chat } from "src/types/db";
+import { DatabaseChat } from "src/types/db";
 
-import { CHAT_MODEL_NAME, MESSAGE_MODEL_NAME } from "./CONSTANTS";
+import {
+  CHAT_MODEL_NAME,
+  MESSAGE_MODEL_NAME,
+  USER_MODEL_NAME
+} from "./CONSTANTS";
 
-interface ChatModel extends Model<Chat> {}
+import "./User";
+import "./Message";
+
+interface ChatModel extends Model<DatabaseChat> {}
 
 const chatSchema = new Schema(
   {
-    name: { type: String, required: true },
-    lastMessage: { type: mongoose.Types.ObjectId, ref: MESSAGE_MODEL_NAME }
+    members: [
+      { type: mongoose.Types.ObjectId, ref: USER_MODEL_NAME, required: true }
+    ],
+    lastMessage: {
+      type: mongoose.Types.ObjectId,
+      ref: MESSAGE_MODEL_NAME,
+      required: true
+    }
   },
   {
     timestamps: {

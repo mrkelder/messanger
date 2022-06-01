@@ -1,14 +1,18 @@
-import { Schema, model, models, Model } from "mongoose";
+import mongoose, { Schema, model, models, Model } from "mongoose";
 
-import { Message } from "src/types/db";
+import { DatabaseMessage } from "src/types/db";
 
-import { MESSAGE_MODEL_NAME } from "./CONSTANTS";
+import { MESSAGE_MODEL_NAME, USER_MODEL_NAME } from "./CONSTANTS";
 
-interface MessageModel extends Model<Message> {}
+interface MessageModel extends Model<DatabaseMessage> {}
 
 const messageSchema = new Schema(
   {
-    author: { type: String, required: true },
+    author: {
+      type: mongoose.Types.ObjectId,
+      ref: USER_MODEL_NAME,
+      required: true
+    },
     text: { type: String, required: true }
   },
   {

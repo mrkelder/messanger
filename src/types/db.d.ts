@@ -10,16 +10,18 @@ export interface DatabseRefreshToken {
   userId: string;
 }
 
-export interface Message {
+export interface DatabaseMessage {
   _id?: string;
-  author: string;
+  author: Omit<DatabaseUser, "password">;
   text: string;
-  createdAt: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
-export interface Chat {
+export interface DatabaseChat {
   _id?: string;
-  name: string;
-  lastMessage: Message;
-  updatedAt: number;
+  members: Omit<DatabaseUser, "password">[];
+  lastMessage: DatabaseMessage;
+  createdAt: string;
+  updatedAt: string;
 }
