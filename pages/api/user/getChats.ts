@@ -31,7 +31,7 @@ export default async function handler(
         res.status(403).send("Access token is expired");
       }
     } else {
-      res.status(403).send("Access token is not specified");
+      res.status(401).send("Access token is not specified");
     }
   } else {
     res.status(405).send("This endpoint only accepts GET method");

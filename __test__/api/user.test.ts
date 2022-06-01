@@ -3,21 +3,17 @@ import mongoose from "mongoose";
 
 import Chat from "src/models/Chat";
 import User from "src/models/User";
-import { DatabaseUser } from "src/types/db";
 import JWT from "src/utils/JWT";
 
 const host = process.env.NEXT_PUBLIC_HOST + "/api/user";
-const registrateAPI = host + "/getChats";
-const conf = { headers: { "Content-Type": "text/plain" } };
+const getChatsAPI = host + "/getChats";
 
 const password = "test-password";
 const userCredantials = { name: "test-user-1", password };
 const peerCredantials = { name: "test-user-2", password };
 
 async function getAccessToken() {
-  await mongoose.connect(process.env.MONGODB_HOST as string);
   const dbUser = await User.find({ name: userCredantials.name });
-  await mongoose.disconnect();
   return JWT.createAccessToken(dbUser[0]?._id);
 }
 
@@ -33,13 +29,15 @@ describe("User", () => {
   });
 
   afterAll(async () => {
+    const user = await User.findByName(userCredantials.name);
+    await Chat.deleteOne({ members: { $in: user?._id } });
     await User.deleteByName(userCredantials.name);
     await User.deleteByName(peerCredantials.name);
-    await mongoose.disconnect();
+    if (mongoose.connection.readyState === 1) await mongoose.disconnect();
   });
 
   test("Should successfully fetch chats", async () => {
-    const { data } = await axios.get(registrateAPI, {
+    const { data } = await axios.get(getChatsAPI, {
       withCredentials: true,
       headers: { Cookie: `accessToken=${await getAccessToken()}` }
     });
@@ -50,7 +48,20 @@ describe("User", () => {
 
   test("Should throw an error because accessToken is not passed", async () => {
     try {
-      await axios.get(registrateAPI);
+      await axios.get(getChatsAPI);
+    } catch ({ message }) {
+      expect(message).toMatch("401");
+    }
+  });
+
+  test("Should throw an error because accessToken is invalid", async () => {
+    try {
+      await axios.get(getChatsAPI, {
+        withCredentials: true,
+        headers: {
+          Cookie: `accessToken=${(await getAccessToken()).replace(/\w/gi, "x")}`
+        }
+      });
     } catch ({ message }) {
       expect(message).toMatch("403");
     }
