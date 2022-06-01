@@ -1,6 +1,6 @@
 import { Schema, model, models, Model } from "mongoose";
 
-import { Message } from "src/types/chat";
+import { Message } from "src/types/db";
 
 import { MESSAGE_MODEL_NAME } from "./CONSTANTS";
 

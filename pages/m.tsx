@@ -6,7 +6,7 @@ import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Header from "src/components/Header";
-import { Chat } from "src/types/chat";
+import { Chat } from "src/types/db";
 import JWT from "src/utils/JWT";
 
 interface Props {

@@ -1,6 +1,6 @@
 import mongoose, { Schema, model, models, Model } from "mongoose";
 
-import { Chat } from "src/types/chat";
+import { Chat } from "src/types/db";
 
 import { CHAT_MODEL_NAME, MESSAGE_MODEL_NAME } from "./CONSTANTS";
 
