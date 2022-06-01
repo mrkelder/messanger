@@ -49,11 +49,13 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   useEffect(() => {
     async function handler() {
       try {
-        // FIXME: refreshToken does NOT work
+        // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
         );
         // FIXME: add "domain" field e.g. domain=messenger.proga.site
+        document.cookie =
+          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
         document.cookie = `accessToken=${data.accessToken}; path=*; max-age=60*60*24*30`;
       } catch {
         document.cookie =
