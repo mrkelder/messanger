@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Chat from "src/models/Chat";
+import { Chat as ClientChat } from "src/types/chat";
 import { DatabaseChat } from "src/types/db";
 import JWT from "src/utils/JWT";
 import RequestHelper from "src/utils/RequestHelper";
@@ -52,12 +53,21 @@ export default async function handler(
 
     private static async retrieveChats(
       idString: string
-    ): Promise<DatabaseChat[]> {
+    ): Promise<ClientChat[]> {
       const _id = new mongoose.Types.ObjectId(idString);
+      return await GetChats.performDatabaseQuery(_id);
+    }
 
-      return (await Chat.find({
+    private static async performDatabaseQuery(
+      _id: mongoose.Types.ObjectId
+    ): Promise<ClientChat[]> {
+      const data = await Chat.find({
         members: { $in: _id }
-      })) as DatabaseChat[];
+      })
+        .populate("members", "name")
+        .populate("lastMessage");
+
+      return data as ClientChat[];
     }
 
     private static throwMethodError() {
@@ -77,5 +87,5 @@ export default async function handler(
     }
   }
 
-  GetChats.run();
+  await GetChats.run();
 }
