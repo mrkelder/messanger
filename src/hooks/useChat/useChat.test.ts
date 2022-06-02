@@ -21,17 +21,17 @@ const chatData: Chat = {
 
 describe("useChat", () => {
   test("Should return user's name", () => {
-    const { getUserName } = useChat(chatData);
+    const { getUserName } = useChat(chatData, user._id);
     expect(getUserName()).toBe(user.name);
   });
 
   test("Should return peer's name", () => {
-    const { getPeerName } = useChat(chatData);
+    const { getPeerName } = useChat(chatData, user._id);
     expect(getPeerName()).toBe(peer.name);
   });
 
   test("Should return a valid lastMessage field", () => {
-    const { formatLastMessage } = useChat(chatData);
+    const { formatLastMessage } = useChat(chatData, user._id);
     expect(formatLastMessage()).toEqual({
       ...chatData.lastMessage,
       author: user.name
@@ -40,7 +40,7 @@ describe("useChat", () => {
 
   test("Should return null because of no last message object", () => {
     const { lastMessage, ...chatDataWithoutLastMessage } = chatData;
-    const { formatLastMessage } = useChat(chatDataWithoutLastMessage);
+    const { formatLastMessage } = useChat(chatDataWithoutLastMessage, user._id);
     expect(formatLastMessage()).toBeNull();
   });
 });

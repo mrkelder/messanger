@@ -1,10 +1,6 @@
-import { useSelector } from "react-redux";
-
-import { RootState } from "src/store";
 import { Chat, Message } from "src/types/chat";
 
-function useChat(chat: Chat) {
-  const _id = useSelector<RootState>(store => store.user._id);
+function useChat(chat: Chat, _id: string) {
   const { members, lastMessage } = chat;
 
   function getUserName(): string {
