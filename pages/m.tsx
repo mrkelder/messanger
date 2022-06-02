@@ -4,8 +4,10 @@ import { Stack, Typography } from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
 
 import Header from "src/components/Header";
+import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
 
@@ -15,8 +17,14 @@ interface Props {
 
 const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
+  const userName = useSelector<RootState>(
+    store => store.user.userName
+  ) as string;
+  const _id = useSelector<RootState>(store => store.user._id) as string;
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
+
+  const userStoreIsValid = userName.length > 0 && _id.length > 0;
 
   useEffect(() => {
     async function fetchChats() {
@@ -33,12 +41,14 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
       } else alert("Error occured");
     }
 
-    if (isAccessTokenValid) fetchChats();
-  }, [isAccessTokenValid]);
+    if (isAccessTokenValid && userStoreIsValid) fetchChats();
+  }, [isAccessTokenValid, userStoreIsValid]);
 
   useEffect(() => {
     async function handler() {
       try {
+        console.warn("request");
+
         // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
@@ -53,8 +63,16 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
         router.push("/");
       }
     }
+
+    if (!userStoreIsValid) {
+      document.cookie =
+        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
+      router.push("/");
+      return;
+    }
+
     if (!isAccessTokenValid) handler();
-  }, [isAccessTokenValid, router]);
+  }, [isAccessTokenValid, router, userStoreIsValid]);
 
   return (
     <>
