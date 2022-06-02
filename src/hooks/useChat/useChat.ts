@@ -1,22 +1,22 @@
 import { Chat, Message } from "src/types/chat";
 
-function useChat(chat: Chat, _id: string) {
-  const { members, lastMessage } = chat;
-
-  function getUserName(): string {
-    return members.find(i => i._id === _id)?.name as string;
+function useChat(_id: string) {
+  function getUserName(chat: Chat): string {
+    return chat.members.find(i => i._id === _id)?.name as string;
   }
 
-  function getPeerName(): string {
-    return members.find(i => i._id !== _id)?.name as string;
+  function getPeerName(chat: Chat): string {
+    return chat.members.find(i => i._id !== _id)?.name as string;
   }
 
-  function formatLastMessage(): Message | null {
+  function formatLastMessage(chat: Chat): Message | null {
+    const { lastMessage } = chat;
+
     let result = lastMessage ?? null;
 
     if (lastMessage) {
       const authorName =
-        _id === lastMessage.author ? getUserName() : getPeerName();
+        _id === lastMessage.author ? getUserName(chat) : getPeerName(chat);
       result = { ...lastMessage, author: authorName };
     }
 
