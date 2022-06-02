@@ -20,27 +20,17 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
   useEffect(() => {
     async function fetchChats() {
-      // TODO: fetching stuff
-      const chat: Chat = {
-        _id: "624182e7f85bf6faab957ff4",
-        peerName: "User 2",
-        lastMessage: {
-          author: "User 1",
-          text: "What's up?",
-          createdAt: "2022-06-01T08:13:47.504+00:00",
-          updatedAt: "2022-06-01T08:13:47.504+00:00"
-        },
-        createdAt: "2022-05-01T08:13:47.504+00:00",
-        updatedAt: "2022-06-01T08:13:47.504+00:00"
-      };
+      const result = await axios.get(
+        process.env.NEXT_PUBLIC_HOST + "/api/user/getChats",
+        { withCredentials: true }
+      );
 
-      setTimeout(() => {
-        const data: Chat[] = new Array(5)
-          .fill(null)
-          .map((_, index) => ({ ...chat, name: chat.peerName + (index + 1) }));
+      if (result.status === 200) {
+        const chats = result.data as Chat[];
+
         setAreChatsLoaded(true);
-        setChats(data);
-      }, 3000);
+        setChats(chats);
+      } else alert("Error occured");
     }
 
     if (isAccessTokenValid) fetchChats();
@@ -80,7 +70,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
           <Stack>
             {chats.map(i => (
-              <p key={i.peerName}>{i.peerName}</p>
+              <p key={i._id}>{i._id}</p>
             ))}
           </Stack>
         </>
