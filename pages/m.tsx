@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
 import Header from "src/components/Header";
+import useChat from "src/hooks/useChat";
 import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
@@ -21,10 +22,9 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
     store => store.user.userName
   ) as string;
   const _id = useSelector<RootState>(store => store.user._id) as string;
+  const { getPeerName } = useChat(_id);
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
-
-  const userStoreIsValid = userName.length > 0 && _id.length > 0;
 
   useEffect(() => {
     async function fetchChats() {
@@ -41,8 +41,8 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
       } else alert("Error occured");
     }
 
-    if (isAccessTokenValid && userStoreIsValid) fetchChats();
-  }, [isAccessTokenValid, userStoreIsValid]);
+    if (isAccessTokenValid) fetchChats();
+  }, [isAccessTokenValid]);
 
   useEffect(() => {
     async function handler() {
@@ -53,6 +53,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
         );
+        // FIXME: create one class to handle this
         // FIXME: add "domain" field e.g. domain=messenger.proga.site
         document.cookie =
           "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
@@ -64,15 +65,8 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
       }
     }
 
-    if (!userStoreIsValid) {
-      document.cookie =
-        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
-      router.push("/");
-      return;
-    }
-
     if (!isAccessTokenValid) handler();
-  }, [isAccessTokenValid, router, userStoreIsValid]);
+  }, [isAccessTokenValid, router]);
 
   return (
     <>
@@ -88,7 +82,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
           <Stack>
             {chats.map(i => (
-              <p key={i._id}>{i._id}</p>
+              <p key={i._id}>{getPeerName(i)}</p>
             ))}
           </Stack>
         </>
