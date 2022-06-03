@@ -13,7 +13,8 @@ const messageSchema = new Schema(
       ref: USER_MODEL_NAME,
       required: true
     },
-    text: { type: String, required: true }
+    text: { type: String, required: true },
+    read: { type: Boolean, required: true }
   },
   {
     timestamps: {

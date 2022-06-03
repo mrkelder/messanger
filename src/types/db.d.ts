@@ -14,6 +14,7 @@ export interface DatabaseMessage {
   _id?: string;
   author: string;
   text: string;
+  read: boolean;
   created_at: string;
   updated_at: string;
 }
