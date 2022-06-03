@@ -12,7 +12,7 @@ export interface DatabseRefreshToken {
 
 export interface DatabaseMessage {
   _id?: string;
-  author: Omit<DatabaseUser, "password">;
+  author: string;
   text: string;
   created_at: string;
   updated_at: string;
