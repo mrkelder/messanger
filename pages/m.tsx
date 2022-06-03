@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
-import { Stack, Typography } from "@mui/material";
+import { Close } from "@mui/icons-material";
+import { Alert, Snackbar, Stack, Typography, IconButton } from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -25,7 +26,11 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const { getPeerName } = useChat(_id);
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
-  const [isRequestFailed, setIsRequestFailed] = useState(true);
+  const [isAlertOpened, setIsAlertOpened] = useState(false);
+
+  const handleAlertClose = useCallback(() => {
+    setIsAlertOpened(false);
+  }, []);
 
   useEffect(() => {
     async function fetchChats() {
@@ -39,7 +44,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
         setAreChatsLoaded(true);
         setChats(chats);
-      } else setIsRequestFailed(true);
+      } else setIsAlertOpened(true);
     }
 
     if (isAccessTokenValid) fetchChats();
@@ -71,9 +76,31 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
     <>
       <Header />
 
-      {isRequestFailed && (
-        <Typography>Chats failed to load. Please, reload the page</Typography>
-      )}
+      {/* TODO: extract this components to its own file */}
+      <Snackbar
+        open={isAlertOpened}
+        onClose={handleAlertClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="error" sx={{ width: "100%" }}>
+          <Stack
+            alignItems="center"
+            justifyContent="space-between"
+            direction="row"
+            sx={{ width: "inherit" }}
+          >
+            <Typography>
+              Chats failed to load. Please, reload the page
+            </Typography>
+            <IconButton
+              sx={{ padding: "0", marginLeft: "3px" }}
+              onClick={handleAlertClose}
+            >
+              <Close />
+            </IconButton>
+          </Stack>
+        </Alert>
+      </Snackbar>
 
       {!areChatsLoaded ? (
         <>
