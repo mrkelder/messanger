@@ -25,6 +25,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const { getPeerName } = useChat(_id);
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
+  const [isRequestFailed, setIsRequestFailed] = useState(true);
 
   useEffect(() => {
     async function fetchChats() {
@@ -38,7 +39,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
         setAreChatsLoaded(true);
         setChats(chats);
-      } else alert("Error occured");
+      } else setIsRequestFailed(true);
     }
 
     if (isAccessTokenValid) fetchChats();
@@ -47,8 +48,6 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   useEffect(() => {
     async function handler() {
       try {
-        console.warn("request");
-
         // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
@@ -71,6 +70,10 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   return (
     <>
       <Header />
+
+      {isRequestFailed && (
+        <Typography>Chats failed to load. Please, reload the page</Typography>
+      )}
 
       {!areChatsLoaded ? (
         <>
