@@ -64,6 +64,7 @@ export default async function handler(
       const data = await Chat.find({
         members: { $in: _id }
       })
+        .sort({ updated_at: -1 })
         .populate("members", "name")
         .populate("lastMessage");
 
