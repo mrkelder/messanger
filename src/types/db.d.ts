@@ -14,14 +14,14 @@ export interface DatabaseMessage {
   _id?: string;
   author: Omit<DatabaseUser, "password">;
   text: string;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface DatabaseChat {
   _id?: string;
   members: Omit<DatabaseUser, "password">[];
   lastMessage?: DatabaseMessage;
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
