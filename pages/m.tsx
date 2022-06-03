@@ -76,6 +76,22 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
     <>
       <Header />
 
+      {!areChatsLoaded ? (
+        <>
+          <Typography>Loading your chats...</Typography>
+        </>
+      ) : (
+        <>
+          {chats.length === 0 && <Typography>You have no chats</Typography>}
+
+          <Stack style={{ maxHeight: "calc(100vh - 50px)", overflowY: "auto" }}>
+            {chats.map(i => (
+              <p key={i._id}>{getPeerName(i)}</p>
+            ))}
+          </Stack>
+        </>
+      )}
+
       {/* TODO: extract this components to its own file */}
       <Snackbar
         open={isAlertOpened}
@@ -101,22 +117,6 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
           </Stack>
         </Alert>
       </Snackbar>
-
-      {!areChatsLoaded ? (
-        <>
-          <Typography>Loading your chats...</Typography>
-        </>
-      ) : (
-        <>
-          {chats.length === 0 && <Typography>You have no chats</Typography>}
-
-          <Stack>
-            {chats.map(i => (
-              <p key={i._id}>{getPeerName(i)}</p>
-            ))}
-          </Stack>
-        </>
-      )}
     </>
   );
 };
