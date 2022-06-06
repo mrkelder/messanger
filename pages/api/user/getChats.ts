@@ -100,7 +100,7 @@ export default async function handler(
           }
         },
         {
-          lastMessage: { $arrayElemAt: ["$messages", 0] }
+          $addFields: { lastMessage: { $arrayElemAt: ["$messages", 0] } }
         },
         { $unset: ["messages"] }
       ]);
