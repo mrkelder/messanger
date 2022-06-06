@@ -102,7 +102,8 @@ export default async function handler(
         {
           $addFields: { lastMessage: { $arrayElemAt: ["$messages", 0] } }
         },
-        { $unset: ["messages"] }
+        { $unset: ["messages"] },
+        { $sort: { updated_at: -1 } }
       ]);
 
       return data as ClientChat[];
