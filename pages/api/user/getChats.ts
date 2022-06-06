@@ -105,7 +105,7 @@ export default async function handler(
         { $unset: ["messages"] }
       ]);
 
-      return [] as ClientChat[];
+      return data as ClientChat[];
     }
 
     private static throwMethodError() {
