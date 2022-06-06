@@ -7,8 +7,8 @@ import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
+import ChatLink from "src/components/ChatLink";
 import Header from "src/components/Header";
-import useChat from "src/hooks/useChat";
 import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
@@ -19,11 +19,7 @@ interface Props {
 
 const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
-  const userName = useSelector<RootState>(
-    store => store.user.userName
-  ) as string;
-  const _id = useSelector<RootState>(store => store.user._id) as string;
-  const { getPeerName } = useChat(_id);
+  const userId = useSelector<RootState>(store => store.user._id) as string;
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
   const [isAlertOpened, setIsAlertOpened] = useState(false);
@@ -86,7 +82,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
           <Stack style={{ maxHeight: "calc(100vh - 50px)", overflowY: "auto" }}>
             {chats.map(i => (
-              <p key={i._id}>{getPeerName(i)}</p>
+              <ChatLink key={i._id} chat={i} userId={userId} />
             ))}
           </Stack>
         </>
