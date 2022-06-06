@@ -9,10 +9,12 @@ import LocalStorage from "src/utils/LocalStorage";
 jest.mock("axios");
 
 const initState = {
+  _id: "",
   userName: ""
 };
 
 const localStorageState = {
+  _id: "iidi9229edj239d29udiwj",
   userName: "New User"
 };
 
@@ -53,7 +55,7 @@ describe("User reducer with localStorage", () => {
     expect(store.getState().user).toEqual(localStorageState);
   });
 
-  test("Should add userData to localStorage", () => {
+  test("Should add user data to localStorage", () => {
     store.dispatch(setUserData(localStorageState));
 
     expect(

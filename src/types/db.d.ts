@@ -9,3 +9,20 @@ export interface DatabseRefreshToken {
   token: string;
   userId: string;
 }
+
+export interface DatabaseMessage {
+  _id?: string;
+  author: string;
+  text: string;
+  read: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DatabaseChat {
+  _id?: string;
+  members: Omit<DatabaseUser, "password">[];
+  lastMessage?: DatabaseMessage;
+  created_at: string;
+  updated_at: string;
+}
