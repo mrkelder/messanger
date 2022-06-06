@@ -140,7 +140,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
       onTouchEnd={removeTouchTimer}
       onClick={navigateToChat}
       onContextMenu={rightClickDeleteChat}
-      sx={{ textTransform: "none" }}
+      sx={{ textTransform: "none", width: "100%" }}
     >
       <Stack
         direction="row"
