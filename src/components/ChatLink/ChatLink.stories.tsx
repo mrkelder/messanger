@@ -172,7 +172,6 @@ UnreadChatWith150Messages.args = {
   userId
 };
 
-const tempDateNow = Date.now.bind({});
 Date.now = () => TEST_DATE;
 
 export const ChatFromCurrentDay = Template.bind({});
@@ -198,5 +197,3 @@ ChatFromPreviousYear.args = {
   chat: chatFromPreviousYear,
   userId
 };
-
-Date.now = tempDateNow;
