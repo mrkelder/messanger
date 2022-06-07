@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 
 import useChat from "src/hooks/useChat";
 import { Chat } from "src/types/chat";
+import MessageTime from "src/utils/MessageTime";
 
 import { DELETE_CHAT_EVENT_NAME } from "../CONSTANTS";
 interface Props {
@@ -21,57 +22,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
   const formattedLastMessage = formatLastMessage(chat);
   const shouldDisplayMessageCount = chat.lastMessage && !chat.lastMessage.read;
   // TODO: use moment js
-  const currentDate = new Date(Date.now()); // Date.now is placed here to facilitate testing
-  const updateDate = new Date(chat.updated_at);
-
-  // TODO: extract this logic to its own utility
-
-  function returnMonthName(monthIndex: number): string {
-    const monthNames = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec"
-    ];
-
-    return monthNames[monthIndex];
-  }
-
-  function returnDate(): string {
-    const yearsAreEqual =
-      currentDate.getFullYear() === updateDate.getFullYear();
-    const monthsAreEqual = currentDate.getMonth() === updateDate.getMonth();
-    const daysAreEqual = currentDate.getDate() === updateDate.getDate();
-    const messageIsMoreThanOneYearsOld =
-      currentDate.getFullYear() > updateDate.getFullYear();
-
-    const shouldReturnMessageTime =
-      yearsAreEqual && monthsAreEqual && daysAreEqual;
-
-    const shouldReturnMessageDate =
-      !shouldReturnMessageTime && !messageIsMoreThanOneYearsOld;
-
-    const shouldReturnMessageYear = messageIsMoreThanOneYearsOld;
-
-    // TODO: print the month like "Apr" - april
-
-    if (shouldReturnMessageTime)
-      return `${updateDate.getHours()}:${updateDate.getMinutes()}`;
-    else if (shouldReturnMessageDate)
-      return `${updateDate.getDate()} ${returnMonthName(
-        updateDate.getMonth()
-      )}`;
-    else if (shouldReturnMessageYear) return String(updateDate.getFullYear());
-    else return "Err";
-  }
+  const messageTime = new MessageTime(new Date(chat.updated_at));
 
   function emitDeleteChatEvent() {
     // FIXME: useCallback
@@ -173,7 +124,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
           sx={{ width: "max-content" }}
         >
           <Typography fontSize="14px" color="grey.600">
-            {returnDate()}
+            {messageTime.returnMessageISODate()}
           </Typography>
           {messageCountComponent}
         </Stack>
