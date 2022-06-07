@@ -2,26 +2,46 @@ import MessageTime from "./index";
 
 describe("Message time", () => {
   beforeEach(() => {
-    Date.now = () => 1654533034977;
+    MessageTime["currentDate"] = new Date(1654533034977);
   });
 
   test("Should return 19:30", () => {
-    const messageTime = new MessageTime(new Date("Mon Jun 06 2022 19:30:00"));
-    expect(messageTime.returnMessageDate()).toBe("19:30");
+    const messageTime = new MessageTime(
+      new Date("Mon Jun 06 2022 19:30:00").toISOString()
+    );
+    expect(messageTime.returnMessageISODate()).toBe("19:30");
   });
 
-  test("Should return 6 Jun", () => {
-    const messageTime = new MessageTime(new Date("Mon Jun 08 2022 19:30:00"));
-    expect(messageTime.returnMessageDate()).toBe("6 Jun");
+  test("Should return 5 Jun", () => {
+    const messageTime = new MessageTime(
+      new Date("Mon Jun 05 2022 19:30:00").toISOString()
+    );
+    expect(messageTime.returnMessageISODate()).toBe("5 Jun");
   });
 
-  test("Should return 2022", () => {
-    const messageTime = new MessageTime(new Date("Mon Jun 06 2023 19:30:00"));
-    expect(messageTime.returnMessageDate()).toBe("2022");
+  test("Should return 5 Mar", () => {
+    const messageTime = new MessageTime(
+      new Date("Sat Mar 05 2022 19:30:00").toISOString()
+    );
+    expect(messageTime.returnMessageISODate()).toBe("5 Mar");
+  });
+
+  test("Should return 2021", () => {
+    const messageTime = new MessageTime(
+      new Date("Mon Jun 06 2021 19:30:00").toISOString()
+    );
+    expect(messageTime.returnMessageISODate()).toBe("2021");
   });
 
   test("Should throw an error", () => {
     try {
-    } catch {}
+      const messageTime = new MessageTime(
+        new Date("Mon Jun 06 2024 19:30:00").toISOString()
+      );
+
+      console.log(messageTime.returnMessageISODate(), "2024");
+    } catch ({ message }) {
+      expect(1).toBe("Your message is from the future");
+    }
   });
 });
