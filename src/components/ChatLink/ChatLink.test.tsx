@@ -128,6 +128,8 @@ describe("ChatLink", () => {
     addEventListener(DELETE_CHAT_EVENT_NAME, mockCallback);
     fireEvent.contextMenu(chatName);
     removeEventListener(DELETE_CHAT_EVENT_NAME, mockCallback);
-    ~expect(mockCallback).toBeCalled();
+    expect(mockCallback).toBeCalled();
   });
+
+  // TODO: check dates
 });
