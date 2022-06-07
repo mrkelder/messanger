@@ -116,7 +116,7 @@ export default async function handler(
           "Set-Cookie",
           `refreshToken=${refreshToken}; httpOnly; max-age=31556952`
         )
-        .json({ accessToken });
+        .json({ accessToken, _id: userId });
     }
 
     private static async createTokens(userId: string): Promise<{

@@ -49,7 +49,7 @@ const Home: NextPage = () => {
         );
 
         saveAccessTokenInCookies(data.accessToken);
-        dispatch(setUserData({ userName: credentials.name }));
+        dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
       } catch ({ response }) {
         setIsSubmitDisabled(false);
@@ -84,7 +84,7 @@ const Home: NextPage = () => {
         );
 
         saveAccessTokenInCookies(data.accessToken);
-        dispatch(setUserData({ userName: credentials.name }));
+        dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
       } catch ({ response }) {
         setIsSubmitDisabled(false);
