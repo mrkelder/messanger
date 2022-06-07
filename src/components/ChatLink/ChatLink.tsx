@@ -21,7 +21,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
   const formattedLastMessage = formatLastMessage(chat);
   const shouldDisplayMessageCount = chat.lastMessage && !chat.lastMessage.read;
   // TODO: use moment js
-  const currentDate = new Date();
+  const currentDate = new Date(Date.now()); // Date.now is placed here to facilitate testing
   const updateDate = new Date(chat.updated_at);
 
   // TODO: extract this logic to its own utility
@@ -129,8 +129,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
       color="white"
       fontSize="12px"
     >
-      {/* FIXME: here should be only countOfUnreadMessage, fix your API and get back */}
-      {Math.min(chat.countOfUnreadMessages ?? 1, 99)}
+      {Math.min(chat.countOfUnreadMessages, 99)}
     </Box>
   ) : null;
 
