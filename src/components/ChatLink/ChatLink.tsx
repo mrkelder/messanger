@@ -128,6 +128,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
       borderRadius="50%"
       color="white"
       fontSize="12px"
+      fontWeight="regular"
     >
       {Math.min(chat.countOfUnreadMessages, 99)}
     </Box>

@@ -4,8 +4,6 @@ import { Chat } from "src/types/chat";
 
 import ChatLink from "./index";
 
-import "styles/globals.css";
-
 const TEST_DATE = 1654533034977;
 
 const user = { _id: "62971fbbd30a2af25d278kf2", name: "Texas" };
