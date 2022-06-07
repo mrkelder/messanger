@@ -1,4 +1,5 @@
-import { Chat, Message } from "src/types/chat";
+import { Chat } from "src/types/chat";
+import { DatabaseMessage } from "src/types/db";
 
 function useChat(_id: string) {
   function getUserName(chat: Chat): string {
@@ -9,7 +10,7 @@ function useChat(_id: string) {
     return chat.members.find(i => i._id !== _id)?.name as string;
   }
 
-  function formatLastMessage(chat: Chat): Message | null {
+  function formatLastMessage(chat: Chat): DatabaseMessage | null {
     const { lastMessage } = chat;
 
     let result = lastMessage ?? null;
