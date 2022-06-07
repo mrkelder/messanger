@@ -1,61 +1,33 @@
-import { FC, useRef } from "react";
+import { FC, MouseEventHandler } from "react";
 
 import { Avatar, Box, Button, Stack, Typography } from "@mui/material";
-import { useRouter } from "next/router";
 
-import useChat from "src/hooks/useChat";
-import { Chat } from "src/types/chat";
-import MessageTime from "src/utils/MessageTime";
+import { DatabaseMessage } from "src/types/db";
 
-import { DELETE_CHAT_EVENT_NAME } from "../CONSTANTS";
 interface Props {
-  chat: Chat;
-  userId: string;
+  formattedLastMessage: DatabaseMessage;
+  countOfUnreadMessages: number;
+  shouldDisplayMessageCount: boolean;
+  peerName: string;
+  messageTime: string;
+
+  touchHoldEmitEvent: () => void;
+  removeTouchTimer: () => void;
+  navigateToChat: () => void;
+  rightClickDeleteChat: MouseEventHandler<HTMLButtonElement>;
 }
 
-const ChatLink: FC<Props> = ({ chat, userId }) => {
-  const { getPeerName, formatLastMessage } = useChat(userId);
-  const router = useRouter();
-  const touchDeleteChatTimer = useRef<NodeJS.Timeout | null>(null);
-
-  const peerName = getPeerName(chat);
-  const formattedLastMessage = formatLastMessage(chat);
-  const shouldDisplayMessageCount = chat.lastMessage && !chat.lastMessage.read;
-  // TODO: use moment js
-  const messageTime = new MessageTime(new Date(chat.updated_at));
-
-  function emitDeleteChatEvent() {
-    // FIXME: useCallback
-    const customEvent = new Event(DELETE_CHAT_EVENT_NAME);
-    dispatchEvent(customEvent);
-  }
-
-  function navigateToChat() {
-    // FIXME: useCallback
-    router.push(`/chat?id=${chat._id}`);
-  }
-
-  function rightClickDeleteChat(event) {
-    // FIXME: useCallback
-    event.preventDefault();
-    emitDeleteChatEvent();
-    return false;
-  }
-
-  function touchHoldEmitEvent(event) {
-    // FIXME: useCallback
-    touchDeleteChatTimer.current = setTimeout(() => {
-      emitDeleteChatEvent();
-    }, 1000);
-  }
-
-  function removeTouchTimer() {
-    if (touchDeleteChatTimer.current) {
-      clearTimeout(touchDeleteChatTimer.current);
-      touchDeleteChatTimer.current = null;
-    }
-  }
-
+const View: FC<Props> = ({
+  formattedLastMessage,
+  countOfUnreadMessages,
+  shouldDisplayMessageCount,
+  peerName,
+  messageTime,
+  touchHoldEmitEvent,
+  removeTouchTimer,
+  navigateToChat,
+  rightClickDeleteChat
+}) => {
   const lastMessageComponent = formattedLastMessage ? (
     <Typography
       color="black"
@@ -81,7 +53,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
       fontSize="12px"
       fontWeight="regular"
     >
-      {Math.min(chat.countOfUnreadMessages, 99)}
+      {Math.min(countOfUnreadMessages, 99)}
     </Box>
   ) : null;
 
@@ -124,7 +96,7 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
           sx={{ width: "max-content" }}
         >
           <Typography fontSize="14px" color="grey.600">
-            {messageTime.returnMessageISODate()}
+            {messageTime}
           </Typography>
           {messageCountComponent}
         </Stack>
@@ -133,17 +105,4 @@ const ChatLink: FC<Props> = ({ chat, userId }) => {
   );
 };
 
-ChatLink.defaultProps = {
-  chat: {
-    _id: "1",
-    members: [
-      { _id: "1", name: "user 1" },
-      { _id: "2", name: "user 2" }
-    ],
-    countOfUnreadMessages: 0,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  }
-};
-
-export default ChatLink;
+export default View;
