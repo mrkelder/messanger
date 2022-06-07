@@ -17,12 +17,12 @@ export interface DatabaseMessage {
   read: boolean;
   created_at: string;
   updated_at: string;
+  chatId: string;
 }
 
 export interface DatabaseChat {
   _id?: string;
   members: Omit<DatabaseUser, "password">[];
-  lastMessage?: DatabaseMessage;
   created_at: string;
   updated_at: string;
 }

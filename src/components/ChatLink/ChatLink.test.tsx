@@ -25,7 +25,8 @@ const chatWithReadLastMessage: Chat = {
     text: "Hello there",
     read: true,
     created_at: "2022-06-01T08:13:47.504+00:00",
-    updated_at: "2022-06-01T08:13:47.504+00:00"
+    updated_at: "2022-06-01T08:13:47.504+00:00",
+    chatId: "62971fbbd30a2af25d278kf2"
   }
 };
 
@@ -37,7 +38,8 @@ const chatWith3UnreadMessages: Chat = {
     text: "Hello there",
     read: false,
     created_at: "2022-06-01T08:13:47.504+00:00",
-    updated_at: "2022-06-01T08:13:47.504+00:00"
+    updated_at: "2022-06-01T08:13:47.504+00:00",
+    chatId: "62971fbbd30a2af25d278kf2"
   },
   countOfUnreadMessages: 3
 };
@@ -126,6 +128,8 @@ describe("ChatLink", () => {
     addEventListener(DELETE_CHAT_EVENT_NAME, mockCallback);
     fireEvent.contextMenu(chatName);
     removeEventListener(DELETE_CHAT_EVENT_NAME, mockCallback);
-    ~expect(mockCallback).toBeCalled();
+    expect(mockCallback).toBeCalled();
   });
+
+  // TODO: check dates
 });

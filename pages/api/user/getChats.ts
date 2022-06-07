@@ -2,6 +2,8 @@ import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import Chat from "src/models/Chat";
+import Message from "src/models/Message";
+import User from "src/models/User";
 import { Chat as ClientChat } from "src/types/chat";
 import { DatabaseChat } from "src/types/db";
 import JWT from "src/utils/JWT";
@@ -44,7 +46,8 @@ export default async function handler(
       try {
         await mongoose.connect(process.env.MONGODB_HOST as string);
         res.json(await GetChats.retrieveChats(idString));
-      } catch {
+      } catch (e) {
+        console.error(e);
         GetChats.throwDatabaseError();
       } finally {
         if (mongoose.connection.readyState === 1) await mongoose.disconnect();
@@ -61,12 +64,47 @@ export default async function handler(
     private static async performDatabaseQuery(
       _id: mongoose.Types.ObjectId
     ): Promise<ClientChat[]> {
-      const data = await Chat.find({
-        members: { $in: _id }
-      })
-        .sort({ updated_at: -1 })
-        .populate("members", "name")
-        .populate("lastMessage");
+      const data = await Chat.aggregate([
+        { $match: { members: { $in: [_id] } } },
+        {
+          $lookup: {
+            from: "messages",
+            localField: "_id",
+            foreignField: "chatId",
+            pipeline: [
+              {
+                $match: {
+                  read: false,
+                  author: { $ne: _id }
+                }
+              },
+              { $sort: { updated_at: -1 } }
+            ],
+            as: "messages"
+          }
+        },
+        {
+          $lookup: {
+            from: "users",
+            let: { members: "$members" },
+            pipeline: [
+              { $match: { $expr: { $in: ["$_id", "$$members"] } } },
+              { $project: { password: 0, __v: 0 } }
+            ],
+            as: "members"
+          }
+        },
+        {
+          $addFields: {
+            countOfUnreadMessages: { $size: "$messages" }
+          }
+        },
+        {
+          $addFields: { lastMessage: { $arrayElemAt: ["$messages", 0] } }
+        },
+        { $unset: ["messages"] },
+        { $sort: { updated_at: -1 } }
+      ]);
 
       return data as ClientChat[];
     }
