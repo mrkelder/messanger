@@ -1,5 +1,4 @@
 import {
-  FormEventHandler,
   ChangeEventHandler,
   useCallback,
   useEffect,
@@ -7,7 +6,7 @@ import {
   useRef
 } from "react";
 
-import { Stack, TextField, Button } from "@mui/material";
+import { Stack, TextField, Button, Typography, Avatar } from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -19,21 +18,35 @@ interface Props {
   isAccessTokenValid: boolean;
 }
 
+interface ClientUser {
+  _id: string;
+  name: string;
+}
+
 const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
-  const [shouldShowResults, setShouldShowResults] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [serachResults, setSerachResults] = useState<
-    Array<{
-      _id: string;
-      name: string;
-    }>
-  >([]);
+  const [serachResults, setSerachResults] = useState<ClientUser[]>([]);
+  const [isRequestLoading, setIsRequestLoading] =
+    useState<boolean | null>(null);
+
+  const requestWasSentOnce = isRequestLoading !== null;
+  const requestIsValid = requestWasSentOnce && !isRequestLoading;
+  const shouldDisplayResults = requestIsValid && serachResults.length > 0;
+  const shouldDisplayNoResults = requestIsValid && serachResults.length === 0;
+
+  const createChat = useCallback(() => {
+    // TODO: some code logic here
+  }, []);
 
   const sendSearchRequest = useCallback(
     (searchInputValue: string) => async () => {
-      console.log(searchInputValue);
+      if (searchInputValue.length === 0) {
+        setIsRequestLoading(null);
+        return;
+      }
+
       try {
         // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
         const { data } = await axios.get(
@@ -47,11 +60,15 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
         // FIXME: add "domain" field e.g. domain=messenger.proga.site
       } catch ({ message }) {
         const errorMessage = message as string;
-        if (errorMessage.match("401") || errorMessage.match("401")) {
+        if (errorMessage.match("404")) {
+          setSerachResults([]);
+        } else {
           document.cookie =
             "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
           router.push("/");
         }
+      } finally {
+        setIsRequestLoading(false);
       }
     },
     [router]
@@ -59,6 +76,8 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
   const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
     ({ target }) => {
+      if (!isRequestLoading) setIsRequestLoading(true);
+
       if (debounceTimer.current) {
         clearInterval(debounceTimer.current);
         debounceTimer.current = null;
@@ -70,10 +89,11 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
       debounceTimer.current = setTimeout(sendSearchRequest(value), 1000);
     },
-    [sendSearchRequest]
+    [sendSearchRequest, isRequestLoading]
   );
 
   useEffect(() => {
+    // FIXME: DO NOT SEND rereshAccessToken request multiple times!
     async function handler() {
       try {
         // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
@@ -115,11 +135,50 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
           />
         </Stack>
 
-        <Stack>
-          {serachResults.map(i => (
-            <p key={i._id}>{i.name}</p>
-          ))}
-        </Stack>
+        {shouldDisplayResults && (
+          <Stack gap={1}>
+            {serachResults.map(i => (
+              <Button
+                key={i._id}
+                onClick={createChat}
+                sx={{ textTransform: "none", width: "100%" }}
+              >
+                <Stack
+                  direction="row"
+                  width="100%"
+                  paddingX={0.25}
+                  paddingY={0.5}
+                  gap={1}
+                  alignItems="center"
+                  sx={{ cursor: "pointer" }}
+                >
+                  <Avatar
+                    sx={{
+                      bgcolor: "primary.dark",
+                      width: "45px",
+                      height: "45px"
+                    }}
+                  >
+                    {i.name.charAt(0).toUpperCase()}
+                  </Avatar>
+
+                  <Typography
+                    fontWeight="bold"
+                    textOverflow="ellipsis"
+                    color="black"
+                    noWrap
+                  >
+                    {i.name}
+                  </Typography>
+                </Stack>
+              </Button>
+            ))}
+          </Stack>
+        )}
+
+        {shouldDisplayNoResults && <Typography>No results</Typography>}
+
+        {isRequestLoading && <Typography>Loading...</Typography>}
       </Stack>
     </>
   );
