@@ -98,7 +98,7 @@ describe("Get users", () => {
       returnConf(await getAccessToken())
     );
 
-    expect(data.name).toBe(userCredantials.name);
+    expect(data[0].name).toBe(userCredantials.name);
   });
 
   test("Should return no users", async () => {
