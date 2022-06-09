@@ -8,10 +8,11 @@ import JWT from "src/utils/JWT";
 const host = process.env.NEXT_PUBLIC_HOST + "/api/user";
 const getChatsAPI = host + "/getChats";
 const getUsersAPI = host + "/getUsers";
+const createChatAPI = host + "/createChat";
 
 const password = "test-password";
-const userCredantials = { name: "test-user-1", password };
-const peerCredantials = { name: "test-user-2", password };
+const userCredantials = { name: "test-user-1", password, _id: "testid1" };
+const peerCredantials = { name: "test-user-2", password, _id: "testid2" };
 
 const returnConf = (accessToken: string) => ({
   withCredentials: true,
@@ -80,6 +81,14 @@ describe("Chat list", () => {
       expect(message).toMatch("403");
     }
   });
+
+  test("Should throw an error because of invalid http method", async () => {
+    try {
+      await axios.put(getChatsAPI, returnConf(await getAccessToken()));
+    } catch ({ message }) {
+      expect(message).toMatch("405");
+    }
+  });
 });
 
 describe("Get users", () => {
@@ -139,6 +148,84 @@ describe("Get users", () => {
       );
     } catch ({ message }) {
       expect(message).toMatch("403");
+    }
+  });
+
+  test("Should throw an error because of invalid http method", async () => {
+    try {
+      await axios.post(
+        getUsersAPI + `?userName=${userCredantials.name}`,
+        returnConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("405");
+    }
+  });
+});
+
+describe("Chat list", () => {
+  beforeAll(async () => {
+    const user = new User(userCredantials);
+    const peer = new User(peerCredantials);
+    await user.save();
+    await peer.save();
+  });
+
+  afterAll(async () => {
+    await User.deleteByName(userCredantials.name);
+    await User.deleteByName(peerCredantials.name);
+  });
+
+  test("Should successfully create a chat", async () => {
+    const { data } = await axios.post(
+      createChatAPI + `?peerId=${peerCredantials._id}`,
+      returnConf(await getAccessToken())
+    );
+
+    const { chatId } = data;
+
+    expect(chatId).toBeDefined();
+    await Chat.deleteOne({ _id: new mongoose.Types.ObjectId(chatId) });
+  });
+
+  test("Should throw an error because accessToken is not passed", async () => {
+    try {
+      await axios.post(createChatAPI + `?peerId=${peerCredantials._id}`);
+    } catch ({ message }) {
+      expect(message).toMatch("401");
+    }
+  });
+
+  test("Should throw an error because accessToken is invalid", async () => {
+    try {
+      await axios.post(
+        createChatAPI + `?peerId=${peerCredantials._id}`,
+        returnBadConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("403");
+    }
+  });
+
+  test("Should throw an error because of an unspecified userName", async () => {
+    try {
+      await axios.post(
+        getUsersAPI + `?peerId=`,
+        returnConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("500");
+    }
+  });
+
+  test("Should throw an error because of invalid http method", async () => {
+    try {
+      await axios.get(
+        createChatAPI + `?peerId=${peerCredantials._id}`,
+        returnConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("405");
     }
   });
 });
