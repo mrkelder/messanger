@@ -49,6 +49,7 @@ export default async function handler(
     private static async sendSuccessfulResponse(userId: string): Promise<void> {
       try {
         await mongoose.connect(process.env.MONGODB_HOST as string);
+
         res.json({
           chatId: await CreateChat.createChatInDB(
             new mongoose.Types.ObjectId(userId)
@@ -68,9 +69,18 @@ export default async function handler(
       const peerIdObject = new mongoose.Types.ObjectId(
         CreateChat.body.peerId as string
       );
-      const newChat = new Chat({ memebers: [userIdObject, peerIdObject] });
-      await newChat.save();
-      return newChat._id as string;
+
+      const members = [userIdObject, peerIdObject];
+
+      const results = await Chat.find({
+        members: { $all: members }
+      });
+
+      if (results.length === 0) {
+        const newChat = new Chat({ members: members });
+        await newChat.save();
+        return newChat._id as string;
+      } else return results[0]._id as string;
     }
 
     private static throwMethodError() {

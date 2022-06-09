@@ -6,17 +6,7 @@ import {
   useRef
 } from "react";
 
-import { Close } from "@mui/icons-material";
-import {
-  Stack,
-  TextField,
-  Button,
-  Typography,
-  Avatar,
-  Alert,
-  Snackbar,
-  IconButton
-} from "@mui/material";
+import { Stack, TextField, Button, Typography, Avatar } from "@mui/material";
 import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -37,7 +27,6 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
   const [searchValue, setSearchValue] = useState("");
-  const [isAlertOpened, setIsAlertOpened] = useState(false);
   const [serachResults, setSerachResults] = useState<ClientUser[]>([]);
   const [isRequestLoading, setIsRequestLoading] =
     useState<boolean | null>(null);
@@ -46,10 +35,6 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const requestIsValid = requestWasSentOnce && !isRequestLoading;
   const shouldDisplayResults = requestIsValid && serachResults.length > 0;
   const shouldDisplayNoResults = requestIsValid && serachResults.length === 0;
-
-  const handleAlertClose = useCallback(() => {
-    setIsAlertOpened(false);
-  }, []);
 
   const createChat = useCallback(
     (peerId: string) => async () => {
@@ -60,9 +45,20 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
           { withCredentials: true }
         );
 
-        router.push(`/chat?id=${data.peerId}`);
-      } catch {
-        setIsAlertOpened(true);
+        router.push(`/chat?id=${data.chatId}`);
+      } catch ({ message }) {
+        // FIXME:
+        // const { data } = await axios.put(
+        //   process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
+        // );
+
+        const errorMessage = message as string;
+        if (errorMessage.match("404")) setSerachResults([]);
+        else {
+          document.cookie =
+            "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
+          router.push("/");
+        }
       }
     },
     [router]
@@ -205,29 +201,6 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
         {shouldDisplayNoResults && <Typography>No results</Typography>}
 
         {isRequestLoading && <Typography>Loading...</Typography>}
-
-        <Snackbar
-          open={isAlertOpened}
-          onClose={handleAlertClose}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        >
-          <Alert severity="error" sx={{ width: "100%" }}>
-            <Stack
-              alignItems="center"
-              justifyContent="space-between"
-              direction="row"
-              sx={{ width: "inherit" }}
-            >
-              <Typography>Could not create a chat, try again</Typography>
-              <IconButton
-                sx={{ padding: "0", marginLeft: "3px" }}
-                onClick={handleAlertClose}
-              >
-                <Close />
-              </IconButton>
-            </Stack>
-          </Alert>
-        </Snackbar>
       </Stack>
     </>
   );

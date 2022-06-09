@@ -224,6 +224,23 @@ describe("Create chat", () => {
     await Chat.deleteOne({ _id: new mongoose.Types.ObjectId(chatId) });
   });
 
+  test("Should successfully find the chat", async () => {
+    const userIdObject = new mongoose.Types.ObjectId(userCredantials._id);
+    const peerIdObject = new mongoose.Types.ObjectId(peerCredantials._id);
+    const members = [userIdObject, peerIdObject];
+    const chat = new Chat({ members });
+    await chat.save();
+
+    const { data } = await axios.post(
+      createChatAPI,
+      { peerId: peerCredantials._id },
+      returnConf(await getAccessToken())
+    );
+
+    expect(data.chatId).toBe(chat._id?.toString());
+    await Chat.deleteOne({ members: { $all: members } });
+  });
+
   test("Should throw an error because accessToken is not passed", async () => {
     try {
       await axios.post(createChatAPI, { peerId: peerCredantials._id });
