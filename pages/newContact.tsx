@@ -27,14 +27,14 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
   const [searchValue, setSearchValue] = useState("");
-  const [serachResults, setSerachResults] = useState<ClientUser[]>([]);
+  const [searchResults, setSearchResults] = useState<ClientUser[]>([]);
   const [isRequestLoading, setIsRequestLoading] =
     useState<boolean | null>(null);
 
   const requestWasSentOnce = isRequestLoading !== null;
   const requestIsValid = requestWasSentOnce && !isRequestLoading;
-  const shouldDisplayResults = requestIsValid && serachResults.length > 0;
-  const shouldDisplayNoResults = requestIsValid && serachResults.length === 0;
+  const shouldDisplayResults = requestIsValid && searchResults.length > 0;
+  const shouldDisplayNoResults = requestIsValid && searchResults.length === 0;
 
   const createChat = useCallback(
     (peerId: string) => async () => {
@@ -53,7 +53,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
         // );
 
         const errorMessage = message as string;
-        if (errorMessage.match("404")) setSerachResults([]);
+        if (errorMessage.match("404")) setSearchResults([]);
         else {
           document.cookie =
             "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
@@ -78,14 +78,14 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
             `/api/user/getUsers?userName=${searchInputValue}`
         );
 
-        setSerachResults(data);
+        setSearchResults(data);
 
         // FIXME: create one class to handle this
         // FIXME: add "domain" field e.g. domain=messenger.proga.site
       } catch ({ message }) {
         const errorMessage = message as string;
         if (errorMessage.match("404")) {
-          setSerachResults([]);
+          setSearchResults([]);
         } else {
           document.cookie =
             "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
@@ -147,8 +147,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
       <Stack paddingY={1.5} paddingX={1}>
         <Stack direction="row" gap={1}>
           <TextField
-            id="standard-search"
-            label="Search field"
+            label="User name"
             type="search"
             variant="outlined"
             fullWidth
@@ -159,7 +158,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
         {shouldDisplayResults && (
           <Stack gap={1}>
-            {serachResults.map(i => (
+            {searchResults.map(i => (
               <Button
                 key={i._id}
                 onClick={createChat(i._id)}
