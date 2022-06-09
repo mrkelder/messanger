@@ -38,17 +38,17 @@ export default async function handler(
 
     private static async verifyToken(): Promise<void> {
       try {
-        JWT.verifyAccessToken(GetChats.accessToken);
-        await GetChats.sendSuccessfulResponse();
+        const { _id } = JWT.verifyAccessToken(GetChats.accessToken);
+        await GetChats.sendSuccessfulResponse(_id);
       } catch {
         GetChats.throwExpiredTokenError();
       }
     }
 
-    private static async sendSuccessfulResponse(): Promise<void> {
+    private static async sendSuccessfulResponse(userId: string): Promise<void> {
       try {
         await mongoose.connect(process.env.MONGODB_HOST as string);
-        const foundUsers = await GetChats.performDatabaseQuery();
+        const foundUsers = await GetChats.performDatabaseQuery(userId);
         GetChats.sendTotalRepsonse(foundUsers);
       } catch (e) {
         GetChats.throwDatabaseError();
@@ -57,11 +57,14 @@ export default async function handler(
       }
     }
 
-    private static async performDatabaseQuery(): Promise<
-      UserWithoutPassword[]
-    > {
+    private static async performDatabaseQuery(
+      userId: string
+    ): Promise<UserWithoutPassword[]> {
       const data = await User.find(
-        { name: { $regex: GetChats.userName } },
+        {
+          _id: { $ne: new mongoose.Types.ObjectId(userId) },
+          name: { $regex: GetChats.userName }
+        },
         { password: 0, __v: 0 }
       );
 
