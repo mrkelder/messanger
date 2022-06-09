@@ -26,7 +26,7 @@ export default async function handler(
     }
 
     private static async checkUserName(): Promise<void> {
-      if (GetChats.userName && GetChats.userName.length > 0)
+      if (typeof GetChats.userName === "string" && GetChats.userName.length > 0)
         await GetChats.checkAccessToken();
       else GetChats.throwInvalidUserNameError();
     }
