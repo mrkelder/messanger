@@ -11,8 +11,16 @@ const getUsersAPI = host + "/getUsers";
 const createChatAPI = host + "/createChat";
 
 const password = "test-password";
-const userCredantials = { name: "test-user-1", password, _id: "testid1" };
-const peerCredantials = { name: "test-user-2", password, _id: "testid2" };
+const userCredantials = {
+  name: "test-user-1",
+  password,
+  _id: new mongoose.Types.ObjectId()
+};
+const peerCredantials = {
+  name: "test-user-2",
+  password,
+  _id: new mongoose.Types.ObjectId()
+};
 
 const returnConf = (accessToken: string) => ({
   withCredentials: true,
@@ -132,6 +140,18 @@ describe("Get users", () => {
     }
   });
 
+  test("Should throw an error because of the multiple userName queries", async () => {
+    try {
+      await axios.get(
+        getUsersAPI +
+          `?userName=${userCredantials.name}&userName=${userCredantials.name}`,
+        returnConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("500");
+    }
+  });
+
   test("Should throw an error because accessToken is not passed", async () => {
     try {
       await axios.get(getUsersAPI + `?userName=test-user-that-does-not-exist`);
@@ -163,7 +183,7 @@ describe("Get users", () => {
   });
 });
 
-describe("Chat list", () => {
+describe("Create chat", () => {
   beforeAll(async () => {
     const user = new User(userCredantials);
     const peer = new User(peerCredantials);
@@ -178,7 +198,8 @@ describe("Chat list", () => {
 
   test("Should successfully create a chat", async () => {
     const { data } = await axios.post(
-      createChatAPI + `?peerId=${peerCredantials._id}`,
+      createChatAPI,
+      { peerId: peerCredantials._id },
       returnConf(await getAccessToken())
     );
 
@@ -190,7 +211,7 @@ describe("Chat list", () => {
 
   test("Should throw an error because accessToken is not passed", async () => {
     try {
-      await axios.post(createChatAPI + `?peerId=${peerCredantials._id}`);
+      await axios.post(createChatAPI, { peerId: peerCredantials._id });
     } catch ({ message }) {
       expect(message).toMatch("401");
     }
@@ -199,7 +220,8 @@ describe("Chat list", () => {
   test("Should throw an error because accessToken is invalid", async () => {
     try {
       await axios.post(
-        createChatAPI + `?peerId=${peerCredantials._id}`,
+        createChatAPI,
+        { peerId: peerCredantials._id },
         returnBadConf(await getAccessToken())
       );
     } catch ({ message }) {
@@ -210,7 +232,20 @@ describe("Chat list", () => {
   test("Should throw an error because of an unspecified userName", async () => {
     try {
       await axios.post(
-        getUsersAPI + `?peerId=`,
+        createChatAPI,
+        { peerId: null },
+        returnConf(await getAccessToken())
+      );
+    } catch ({ message }) {
+      expect(message).toMatch("500");
+    }
+  });
+
+  test("Should throw an error because of the multiple peerId queries", async () => {
+    try {
+      await axios.post(
+        createChatAPI,
+        { peerId: [peerCredantials._id, peerCredantials._id] },
         returnConf(await getAccessToken())
       );
     } catch ({ message }) {
