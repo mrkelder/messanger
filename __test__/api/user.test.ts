@@ -5,6 +5,8 @@ import Chat from "src/models/Chat";
 import User from "src/models/User";
 import JWT from "src/utils/JWT";
 
+jest.setTimeout(60 * 1000);
+
 const host = process.env.NEXT_PUBLIC_HOST + "/api/user";
 const getChatsAPI = host + "/getChats";
 const getUsersAPI = host + "/getUsers";
