@@ -11,6 +11,7 @@ import { useDispatch } from "react-redux";
 import AuthPageTemplate from "src/components/AuthPageTemplate";
 import { setUserData } from "src/store/reducers/userReducer";
 import { Credentials } from "src/types/auth";
+import Cookie from "src/utils/Cookie";
 
 const Home: NextPage = () => {
   const dispatch = useDispatch();
@@ -35,8 +36,7 @@ const Home: NextPage = () => {
   };
 
   const saveAccessTokenInCookies = (accessToken: string) => {
-    // FIXME: add "domain" field e.g. domain=messenger.proga.site
-    document.cookie = `accessToken=${accessToken}; path=*; max-age=60*60*24*30`;
+    Cookie.set("accessToken", accessToken);
   };
 
   const registrate = useCallback(

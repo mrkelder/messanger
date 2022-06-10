@@ -11,6 +11,7 @@ import ChatLink from "src/components/ChatLink";
 import Header from "src/components/Header";
 import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
+import Cookie from "src/utils/Cookie";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -53,14 +54,10 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
         const { data } = await axios.put(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
         );
-        // FIXME: create one class to handle this
-        // FIXME: add "domain" field e.g. domain=messenger.proga.site
-        document.cookie =
-          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
-        document.cookie = `accessToken=${data.accessToken}; path=*; max-age=60*60*24*30`;
+
+        Cookie.set("accessToken", data.accessToken);
       } catch {
-        document.cookie =
-          "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
+        Cookie.remove("accessToken");
         router.push("/");
       }
     }
