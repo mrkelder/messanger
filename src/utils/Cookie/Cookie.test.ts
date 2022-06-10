@@ -1,7 +1,7 @@
 import Cookie from "./index";
 
-const name = "test-cookie";
-const value = "test-value";
+const name = "testCookie";
+const value = "testValue";
 
 describe("Cookie", () => {
   test("Should set a cookie", () => {
