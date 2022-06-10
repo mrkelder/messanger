@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { RootState } from "src/store";
 import { initStoreFromLocalStorage } from "src/store/reducers/userReducer";
+import Cookie from "src/utils/Cookie";
 
 interface Props {
   children?: React.ReactNode;
@@ -29,9 +30,7 @@ const Layout: FC<Props> = ({ children }) => {
     }
 
     if (userStoreDataIsInvalid && !userIsOnTheRootPage && isStoreInitiated) {
-      // FIXME: create one class to handle this
-      document.cookie =
-        "accessToken=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=*;";
+      Cookie.remove("accessToken");
       router.push("/");
       return;
     }

@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import RefreshToken from "src/models/RefreshToken";
 import User from "src/models/User";
 
+jest.setTimeout(60 * 1000);
+
 const host = process.env.NEXT_PUBLIC_HOST + "/api/auth";
 const registrateAPI = host + "/registrate";
 const authorizateAPI = host + "/authorizate";
@@ -16,8 +18,6 @@ const testUser = {
 };
 const testUserWithoutName = { password: testUser.password };
 const testUserWithoutPassword = { name: testUser.name };
-
-jest.setTimeout(15 * 1000);
 
 async function deleteUser() {
   const user = await User.findByName(testUser.name);
@@ -37,12 +37,13 @@ async function registrateUser(): Promise<string> {
 }
 
 beforeAll(async () => {
+  // FIXME: use env
   await mongoose.connect("mongodb://127.0.0.1:27017/messenger");
   await deleteUser();
 });
 
 afterAll(async () => {
-  await mongoose.disconnect();
+  if (mongoose.connection.readyState === 1) await mongoose.disconnect();
 });
 
 describe("Registration", () => {
