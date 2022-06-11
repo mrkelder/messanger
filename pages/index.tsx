@@ -51,9 +51,9 @@ const Home: NextPage = () => {
         saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
-      } catch ({ response }) {
+      } catch (error: any) {
         setIsSubmitDisabled(false);
-        const { status } = response as { status: number };
+        const status = error?.response?.status as undefined | number;
         switch (status) {
           case 409:
             setAndOpenErrorAlert("Such user already exists, try another name");
@@ -86,9 +86,9 @@ const Home: NextPage = () => {
         saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
-      } catch ({ response }) {
+      } catch (error: any) {
         setIsSubmitDisabled(false);
-        const { status } = response as { status: number };
+        const status = error?.response?.status as undefined | number;
         switch (status) {
           case 401:
             setAndOpenErrorAlert("Password is not correct");

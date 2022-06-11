@@ -116,7 +116,7 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
 
 export const getServerSideProps: GetServerSideProps = async context => {
   class SSRHandler {
-    private static accessToken = context.req.cookies.accessToken;
+    public static accessToken = context.req.cookies.accessToken;
     private static returnConfig: GetServerSidePropsResult<Props>;
 
     public static returnTotalConfig(): GetServerSidePropsResult<Props> {
@@ -153,6 +153,9 @@ export const getServerSideProps: GetServerSideProps = async context => {
       SSRHandler.returnConfig = { props: { isAccessTokenValid: false } };
     }
   }
+  if (!SSRHandler.accessToken)
+    return { redirect: { destination: "/", permanent: false } };
+
   return SSRHandler.returnTotalConfig();
 };
 
