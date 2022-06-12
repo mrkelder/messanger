@@ -1,18 +1,17 @@
 import {
   ChangeEventHandler,
   useCallback,
-  useEffect,
   useState,
-  useRef
+  useRef,
+  useContext
 } from "react";
 
 import { Stack, TextField, Button, Typography, Avatar } from "@mui/material";
-import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Header from "src/components/Header";
-import Cookie from "src/utils/Cookie";
+import AxiosContext from "src/contexts/axiosContext";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -27,6 +26,7 @@ interface ClientUser {
 const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
+  const axiosInstance = useContext(AxiosContext);
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<ClientUser[]>([]);
   const [isRequestLoading, setIsRequestLoading] =
@@ -39,29 +39,15 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
   const createChat = useCallback(
     (peerId: string) => async () => {
-      try {
-        const { data } = await axios.post(
-          process.env.NEXT_PUBLIC_HOST + "/api/user/createChat",
-          { peerId },
-          { withCredentials: true }
-        );
+      const { data } = await axiosInstance.post(
+        process.env.NEXT_PUBLIC_HOST + "/api/user/createChat",
+        { peerId },
+        { withCredentials: true }
+      );
 
-        router.push(`/chat?id=${data.chatId}`);
-      } catch ({ message }) {
-        // FIXME:
-        // const { data } = await axios.put(
-        //   process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
-        // );
-
-        const errorMessage = message as string;
-        if (errorMessage.match("404")) setSearchResults([]);
-        else {
-          Cookie.remove("accessToken");
-          router.push("/");
-        }
-      }
+      router.push(`/chat?id=${data.chatId}`);
     },
-    [router]
+    [router, axiosInstance]
   );
 
   const sendSearchRequest = useCallback(
@@ -72,26 +58,19 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
       }
 
       try {
-        // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
-        const { data } = await axios.get(
+        const { data } = await axiosInstance.get(
           process.env.NEXT_PUBLIC_HOST +
             `/api/user/getUsers?userName=${searchInputValue}`
         );
 
         setSearchResults(data);
       } catch ({ message }) {
-        const errorMessage = message as string;
-        if (errorMessage.match("404")) {
-          setSearchResults([]);
-        } else {
-          Cookie.remove("accessToken");
-          router.push("/");
-        }
+        setSearchResults([]);
       } finally {
         setIsRequestLoading(false);
       }
     },
-    [router]
+    [axiosInstance]
   );
 
   const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
@@ -111,25 +90,6 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
     },
     [sendSearchRequest, isRequestLoading]
   );
-
-  useEffect(() => {
-    // FIXME: DO NOT SEND rereshAccessToken request multiple times!
-    async function handler() {
-      try {
-        // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
-        const { data } = await axios.put(
-          process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
-        );
-
-        Cookie.set("accessToken", data.accessToken);
-      } catch {
-        Cookie.remove("accessToken");
-        router.push("/");
-      }
-    }
-
-    if (!isAccessTokenValid) handler();
-  }, [isAccessTokenValid, router]);
 
   return (
     <>
@@ -198,7 +158,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
 export const getServerSideProps: GetServerSideProps = async context => {
   class SSRHandler {
-    private static accessToken = context.req.cookies.accessToken;
+    public static accessToken = context.req.cookies.accessToken;
     private static returnConfig: GetServerSidePropsResult<Props>;
 
     public static returnTotalConfig(): GetServerSidePropsResult<Props> {
@@ -235,6 +195,10 @@ export const getServerSideProps: GetServerSideProps = async context => {
       SSRHandler.returnConfig = { props: { isAccessTokenValid: false } };
     }
   }
+
+  if (!SSRHandler.accessToken)
+    return { redirect: { destination: "/", permanent: false } };
+
   return SSRHandler.returnTotalConfig();
 };
 

@@ -36,9 +36,15 @@ const userSlice = createSlice({
         state = initialState;
         LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, state);
       }
+    },
+    clear(state) {
+      state._id = initialState._id;
+      state.userName = initialState.userName;
+      LocalStorage.remove(USER_DATA_LOCAL_STORAGE_NAME);
     }
   }
 });
 
-export const { setUserData, initStoreFromLocalStorage } = userSlice.actions;
+export const { setUserData, initStoreFromLocalStorage, clear } =
+  userSlice.actions;
 export default userSlice.reducer;
