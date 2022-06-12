@@ -6,7 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AxiosInstance from "src/contexts/axiosContext";
 import { RootState } from "src/store";
-import { initStoreFromLocalStorage } from "src/store/reducers/userReducer";
+import {
+  clear,
+  initStoreFromLocalStorage
+} from "src/store/reducers/userReducer";
 import Cookie from "src/utils/Cookie";
 
 interface Props {
@@ -46,6 +49,7 @@ const Layout: FC<Props> = ({ children }) => {
 
             Cookie.set("accessToken", data.accessToken);
           } catch {
+            dispatch(clear());
             Cookie.remove("accessToken");
             router.push("/");
           } finally {
@@ -64,7 +68,7 @@ const Layout: FC<Props> = ({ children }) => {
 
       isAxiosInterceptorAssigned.current = true;
     }
-  }, [router, userIsOnTheRootPage, axiosInstance]);
+  }, [router, userIsOnTheRootPage, axiosInstance, dispatch]);
 
   useEffect(() => {
     if (!isStoreInitiated) {
@@ -73,6 +77,7 @@ const Layout: FC<Props> = ({ children }) => {
     }
 
     if (userStoreDataIsInvalid && !userIsOnTheRootPage && isStoreInitiated) {
+      dispatch(clear());
       Cookie.remove("accessToken");
       router.push("/");
       return;
