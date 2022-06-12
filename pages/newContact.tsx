@@ -1,11 +1,17 @@
-import { ChangeEventHandler, useCallback, useState, useRef } from "react";
+import {
+  ChangeEventHandler,
+  useCallback,
+  useState,
+  useRef,
+  useContext
+} from "react";
 
 import { Stack, TextField, Button, Typography, Avatar } from "@mui/material";
-import axios from "axios";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
 import Header from "src/components/Header";
+import AxiosContext from "src/contexts/axiosContext";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -20,6 +26,7 @@ interface ClientUser {
 const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
+  const axiosInstance = useContext(AxiosContext);
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<ClientUser[]>([]);
   const [isRequestLoading, setIsRequestLoading] =
@@ -32,7 +39,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
   const createChat = useCallback(
     (peerId: string) => async () => {
-      const { data } = await axios.post(
+      const { data } = await axiosInstance.post(
         process.env.NEXT_PUBLIC_HOST + "/api/user/createChat",
         { peerId },
         { withCredentials: true }
@@ -40,7 +47,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 
       router.push(`/chat?id=${data.chatId}`);
     },
-    [router]
+    [router, axiosInstance]
   );
 
   const sendSearchRequest = useCallback(
@@ -51,7 +58,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
       }
 
       try {
-        const { data } = await axios.get(
+        const { data } = await axiosInstance.get(
           process.env.NEXT_PUBLIC_HOST +
             `/api/user/getUsers?userName=${searchInputValue}`
         );
@@ -63,7 +70,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
         setIsRequestLoading(false);
       }
     },
-    []
+    [axiosInstance]
   );
 
   const changeHandler = useCallback<ChangeEventHandler<HTMLInputElement>>(
