@@ -2,7 +2,8 @@ import store from "src/store";
 import { USER_DATA_LOCAL_STORAGE_NAME } from "src/store/CONSTANTS";
 import reducer, {
   setUserData,
-  initStoreFromLocalStorage
+  initStoreFromLocalStorage,
+  clear
 } from "src/store/reducers/userReducer";
 import LocalStorage from "src/utils/LocalStorage";
 
@@ -36,6 +37,10 @@ describe("User reducer", () => {
       userName: customUserName
     });
   });
+
+  test("Should set to defaults", () => {
+    expect(reducer({ ...localStorageState }, clear())).toEqual(initState);
+  });
 });
 
 describe("User reducer with localStorage", () => {
@@ -63,5 +68,12 @@ describe("User reducer with localStorage", () => {
     ).toEqual({
       ...localStorageState
     });
+  });
+
+  test("Should set localStorage to null", () => {
+    LocalStorage.set(USER_DATA_LOCAL_STORAGE_NAME, localStorageState);
+    store.dispatch(clear());
+
+    expect(LocalStorage.get<null>(USER_DATA_LOCAL_STORAGE_NAME)).toBeNull();
   });
 });

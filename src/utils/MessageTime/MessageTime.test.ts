@@ -35,11 +35,7 @@ describe("Message time", () => {
 
   test("Should throw an error", () => {
     try {
-      const messageTime = new MessageTime(
-        new Date("Mon Jun 06 2024 19:30:00").toISOString()
-      );
-
-      console.log(messageTime.returnMessageISODate(), "2024");
+      new MessageTime(new Date("Mon Jun 06 2024 19:30:00").toISOString());
     } catch ({ message }) {
       expect(1).toBe("Your message is from the future");
     }

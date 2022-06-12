@@ -1,14 +1,14 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useContext } from "react";
 
 import { Close } from "@mui/icons-material";
 import { Alert, IconButton, Snackbar, Stack, Typography } from "@mui/material";
-import axios from "axios";
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 
 import AuthPageTemplate from "src/components/AuthPageTemplate";
+import AxiosContext from "src/contexts/axiosContext";
 import { setUserData } from "src/store/reducers/userReducer";
 import { Credentials } from "src/types/auth";
 import Cookie from "src/utils/Cookie";
@@ -16,6 +16,7 @@ import Cookie from "src/utils/Cookie";
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
+  const axiosInstance = useContext(AxiosContext);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   const [isRegistration, setIsRegistration] = useState(true);
   const [isAlertOpened, setIsAlertOpened] = useState(false);
@@ -43,7 +44,7 @@ const Home: NextPage = () => {
     async (credentials: Credentials) => {
       try {
         setIsSubmitDisabled(true);
-        const { data } = await axios.post(
+        const { data } = await axiosInstance.post(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/registrate",
           credentials
         );
@@ -51,9 +52,9 @@ const Home: NextPage = () => {
         saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
-      } catch ({ response }) {
+      } catch (error: any) {
         setIsSubmitDisabled(false);
-        const { status } = response as { status: number };
+        const status = error?.response?.status as undefined | number;
         switch (status) {
           case 409:
             setAndOpenErrorAlert("Such user already exists, try another name");
@@ -71,14 +72,14 @@ const Home: NextPage = () => {
         }
       }
     },
-    [dispatch, router]
+    [dispatch, router, axiosInstance]
   );
 
   const authorizate = useCallback(
     async (credentials: Credentials) => {
       try {
         setIsSubmitDisabled(true);
-        const { data } = await axios.post(
+        const { data } = await axiosInstance.post(
           process.env.NEXT_PUBLIC_HOST + "/api/auth/authorizate",
           credentials
         );
@@ -86,9 +87,9 @@ const Home: NextPage = () => {
         saveAccessTokenInCookies(data.accessToken);
         dispatch(setUserData({ userName: credentials.name, _id: data._id }));
         router.push("/m");
-      } catch ({ response }) {
+      } catch (error: any) {
         setIsSubmitDisabled(false);
-        const { status } = response as { status: number };
+        const status = error?.response?.status as undefined | number;
         switch (status) {
           case 401:
             setAndOpenErrorAlert("Password is not correct");
@@ -109,7 +110,7 @@ const Home: NextPage = () => {
         }
       }
     },
-    [dispatch, router]
+    [dispatch, router, axiosInstance]
   );
 
   const changePage = useCallback(() => {

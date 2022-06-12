@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
-import { Close } from "@mui/icons-material";
-import { Alert, Snackbar, Stack, Typography, IconButton } from "@mui/material";
-import axios from "axios";
+import { Stack, Typography } from "@mui/material";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
-import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 
 import ChatLink from "src/components/ChatLink";
 import Header from "src/components/Header";
+import AxiosContext from "src/contexts/axiosContext";
 import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
-import Cookie from "src/utils/Cookie";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -19,51 +16,29 @@ interface Props {
 }
 
 const M: NextPage<Props> = ({ isAccessTokenValid }) => {
-  const router = useRouter();
   const userId = useSelector<RootState>(store => store.user._id) as string;
+  const axiosInstance = useContext(AxiosContext);
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
-  const [isAlertOpened, setIsAlertOpened] = useState(false);
-
-  const handleAlertClose = useCallback(() => {
-    setIsAlertOpened(false);
-  }, []);
 
   useEffect(() => {
     async function fetchChats() {
-      const result = await axios.get(
-        process.env.NEXT_PUBLIC_HOST + "/api/user/getChats",
-        { withCredentials: true }
-      );
-
-      if (result.status === 200) {
-        const chats = result.data as Chat[];
-
-        setAreChatsLoaded(true);
-        setChats(chats);
-      } else setIsAlertOpened(true);
-    }
-
-    if (isAccessTokenValid) fetchChats();
-  }, [isAccessTokenValid]);
-
-  useEffect(() => {
-    async function handler() {
       try {
-        // FIXME: refreshToken does NOT work in case you remove accessToken from cookies or it expires
-        const { data } = await axios.put(
-          process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
+        const result = await axiosInstance.get(
+          process.env.NEXT_PUBLIC_HOST + "/api/user/getChats",
+          { withCredentials: true }
         );
 
-        Cookie.set("accessToken", data.accessToken);
-      } catch {
-        Cookie.remove("accessToken");
-        router.push("/");
+        const chats = result.data as Chat[];
+        setAreChatsLoaded(true);
+        setChats(chats);
+      } finally {
+        setAreChatsLoaded(true);
       }
     }
 
-    if (!isAccessTokenValid) handler();
-  }, [isAccessTokenValid, router]);
+    fetchChats();
+  }, [axiosInstance]);
 
   return (
     <>
@@ -84,39 +59,13 @@ const M: NextPage<Props> = ({ isAccessTokenValid }) => {
           </Stack>
         </>
       )}
-
-      {/* TODO: extract this components to its own file */}
-      <Snackbar
-        open={isAlertOpened}
-        onClose={handleAlertClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="error" sx={{ width: "100%" }}>
-          <Stack
-            alignItems="center"
-            justifyContent="space-between"
-            direction="row"
-            sx={{ width: "inherit" }}
-          >
-            <Typography>
-              Chats failed to load. Please, reload the page
-            </Typography>
-            <IconButton
-              sx={{ padding: "0", marginLeft: "3px" }}
-              onClick={handleAlertClose}
-            >
-              <Close />
-            </IconButton>
-          </Stack>
-        </Alert>
-      </Snackbar>
     </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async context => {
   class SSRHandler {
-    private static accessToken = context.req.cookies.accessToken;
+    public static accessToken = context.req.cookies.accessToken;
     private static returnConfig: GetServerSidePropsResult<Props>;
 
     public static returnTotalConfig(): GetServerSidePropsResult<Props> {
@@ -153,6 +102,9 @@ export const getServerSideProps: GetServerSideProps = async context => {
       SSRHandler.returnConfig = { props: { isAccessTokenValid: false } };
     }
   }
+  if (!SSRHandler.accessToken)
+    return { redirect: { destination: "/", permanent: false } };
+
   return SSRHandler.returnTotalConfig();
 };
 
