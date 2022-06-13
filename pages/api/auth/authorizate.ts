@@ -70,7 +70,7 @@ export default async function handler(
       const foundUser = await Authorization.lookForUser();
       if (foundUser)
         await Authorization.checkCredentials(
-          foundUser._id as string,
+          foundUser._id as unknown as mongoose.Types.ObjectId,
           foundUser.password
         );
       else this.throwUserNotFoundError();
@@ -87,7 +87,7 @@ export default async function handler(
     }
 
     private static async checkCredentials(
-      userId: string,
+      userId: mongoose.Types.ObjectId,
       actualPassword: string
     ) {
       if (await Authorization.areCredentialsEqual(actualPassword))
@@ -104,12 +104,14 @@ export default async function handler(
       );
     }
 
-    private static async sendSuccessResponse(userId: string) {
+    private static async sendSuccessResponse(userId: mongoose.Types.ObjectId) {
       const { accessToken, refreshToken } = await Authorization.createTokens(
         userId
       );
 
       await RefreshToken.refresh(userId, refreshToken);
+
+      res.removeHeader("Set-Cookie");
 
       res
         .setHeader(
@@ -119,12 +121,14 @@ export default async function handler(
         .json({ accessToken, _id: userId });
     }
 
-    private static async createTokens(userId: string): Promise<{
+    private static async createTokens(
+      userId: mongoose.Types.ObjectId
+    ): Promise<{
       accessToken: string;
       refreshToken: string;
     }> {
-      const accessToken = JWT.createAccessToken(userId);
-      const refreshToken = JWT.createRefreshToken(userId);
+      const accessToken = JWT.createAccessToken(userId.toString());
+      const refreshToken = JWT.createRefreshToken(userId.toString());
       return { accessToken, refreshToken };
     }
 

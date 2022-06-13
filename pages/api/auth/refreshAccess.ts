@@ -78,6 +78,8 @@ export default async function handler(
 
       await RefreshToken.refresh(userId, refreshToken);
 
+      res.removeHeader("Set-Cookie");
+
       res
         .setHeader(
           "Set-Cookie",

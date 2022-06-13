@@ -25,13 +25,16 @@ const refreshTokenSchema = new Schema({
 
 refreshTokenSchema.static(
   "refresh",
-  async function (
-    userId: string | mongoose.Types.ObjectId,
-    newRefreshToken: string
-  ) {
+  async function (userId: mongoose.Types.ObjectId, newRefreshToken: string) {
     await this.updateOne(
-      { userId: new mongoose.Types.ObjectId(userId) },
-      { $set: { token: newRefreshToken } }
+      { userId },
+      {
+        $set: {
+          token: newRefreshToken,
+          userId
+        }
+      },
+      { upsert: true }
     );
   }
 );

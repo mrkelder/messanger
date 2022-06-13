@@ -101,6 +101,9 @@ export default async function handler(
       const { accessToken, refreshToken } = await Registration.createTokens(
         userId
       );
+
+      res.removeHeader("Set-Cookie");
+
       res
         .setHeader(
           "Set-Cookie",
