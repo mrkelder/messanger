@@ -48,12 +48,15 @@ const Layout: FC<Props> = ({ children }) => {
             );
 
             Cookie.set("accessToken", data.accessToken);
-          } catch {
-            dispatch(clear());
-            Cookie.remove("accessToken");
-            router.push("/");
-          } finally {
-            return Promise.reject(error);
+            return await axiosInstance(config);
+          } catch ({ message }) {
+            const errorMessage = message as string;
+            if (errorMessage.match("401") || errorMessage.match("403")) {
+              dispatch(clear());
+              Cookie.remove("accessToken");
+              router.push("/");
+              return Promise.reject(error);
+            }
           }
         }
       }
