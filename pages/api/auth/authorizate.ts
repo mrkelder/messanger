@@ -109,7 +109,7 @@ export default async function handler(
         userId
       );
 
-      await RefreshToken.refresh(userId, refreshToken);
+      await RefreshToken.refreshOrInsert(userId, refreshToken);
 
       res.removeHeader("Set-Cookie");
 
