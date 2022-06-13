@@ -60,7 +60,8 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
       try {
         const { data } = await axiosInstance.get(
           process.env.NEXT_PUBLIC_HOST +
-            `/api/user/getUsers?userName=${searchInputValue}`
+            `/api/user/getUsers?userName=${searchInputValue}`,
+          { withCredentials: true }
         );
 
         setSearchResults(data);

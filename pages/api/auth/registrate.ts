@@ -101,6 +101,9 @@ export default async function handler(
       const { accessToken, refreshToken } = await Registration.createTokens(
         userId
       );
+
+      res.removeHeader("Set-Cookie");
+
       res
         .setHeader(
           "Set-Cookie",
@@ -123,11 +126,10 @@ export default async function handler(
       userId: string,
       refreshToken: string
     ) {
-      const databaseRefreshToken = new RefreshToken({
-        userId: new mongoose.Types.ObjectId(userId),
-        token: refreshToken
-      });
-      await databaseRefreshToken.save();
+      await RefreshToken.refreshOrInsert(
+        new mongoose.Types.ObjectId(userId),
+        refreshToken
+      );
     }
   }
 
