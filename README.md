@@ -27,6 +27,7 @@ An online messenger to chat with other users. This project is intended to demons
   - [Mongodb models 🐾](#mongodb-models)
   - [Redux 🧰](#redux)
   - [Constants 📛](#constants)
+  - [Controllers ⚙](#Controllers)
 - [Environments 🌲](#environments)
 - [Git 🦑](#git)
   - [Branching 🌿](#branching)
@@ -255,6 +256,10 @@ Redux is located inside of **/src/store/** folder. In the root of this folder th
 ### Constants
 
 Constants are usually used across the whole project from components to redux actions. Thus they should be stored in catalogs rather than in a certain place. For instance, if a constant is a DOM event name and is more associated with components, then **CONSTANTS.ts** file has to belong to **/src/components/**. Same thing for redux contants as well as for mongoose ones and so on
+
+### Controllers
+
+Controllers are actual pieces of code that can be easily tested and integrated into a real code. Controllers' purpose is to handle business logic while omitting the implementation details. For instance, we could write an **authorization service** that saves the data to db and handles the token verification. Such code can be easily tested and integrated into the actual API endpoint. Controllers are stores inside of **src/controllers** folder
 
 ## Environments
 
