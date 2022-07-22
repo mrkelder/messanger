@@ -4,7 +4,7 @@ import { DatabaseUser } from "src/types/db";
 
 import { USER_MODEL_NAME } from "./CONSTANTS";
 
-type UserDocument = Document & Omit<DatabaseUser, "_id">;
+export type UserDocument = Document & Omit<DatabaseUser, "_id">;
 
 interface UserModel extends Model<UserDocument> {
   findByName(name: string): Promise<UserDocument | undefined>;
