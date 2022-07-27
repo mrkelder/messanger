@@ -7,7 +7,7 @@ import RequestHelper from "src/utils/RequestHelper";
 
 type AuthHttpMethods = "POST" | "PUT";
 
-type ExecMethod = () => unknown;
+type ExecMethod = () => Promise<unknown>;
 
 export interface AuthControllerInput {
   req: NextApiRequest;
@@ -51,7 +51,7 @@ export abstract class AuthController {
   protected async setUp(execMethod: ExecMethod) {
     try {
       await this.connectToDb();
-      execMethod();
+      await execMethod();
     } catch {
       if (!this.isUnexpectedErrorThrown) this.throwServerError();
     } finally {

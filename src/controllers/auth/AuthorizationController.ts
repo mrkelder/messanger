@@ -15,7 +15,8 @@ export class AuthorizationController extends AuthController {
   }
 
   public async run() {
-    await this.setUp(this.exec);
+    const bindedExec = this.exec.bind(this);
+    await this.setUp(bindedExec);
   }
 
   protected async exec() {
