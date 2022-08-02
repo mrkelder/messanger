@@ -12,8 +12,8 @@ interface UserModel extends Model<UserDocument> {
 }
 
 const userSchema = new Schema({
-  name: String,
-  password: String
+  name: { type: String, required: true },
+  password: { type: String, required: true }
 });
 
 userSchema.static("findByName", async function (name: string): Promise<
