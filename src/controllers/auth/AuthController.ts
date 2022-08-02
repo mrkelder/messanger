@@ -9,6 +9,8 @@ type AuthHttpMethods = "POST" | "PUT";
 
 type ExecMethod = () => Promise<unknown>;
 
+type ErrorReturn = Error | void;
+
 export interface AuthControllerInput {
   req: NextApiRequest;
   res: NextApiResponse;
@@ -78,34 +80,34 @@ export abstract class AuthController {
     }
   }
 
-  protected throwHttpMethod(): Error {
+  protected throwHttpMethod(): ErrorReturn {
     return this.throwError(405, "Unacceptable http method");
   }
 
-  protected throwServerError(): Error {
+  protected throwServerError(): ErrorReturn {
     return this.throwError(500, "Server could not handle the request");
   }
 
-  protected throwRefreshTokenInvalid(): Error {
+  protected throwRefreshTokenInvalid(): ErrorReturn {
     return this.throwError(401, "Refresh token invalid");
   }
 
-  protected throwUserExists(): Error {
+  protected throwUserExists(): ErrorReturn {
     return this.throwError(409, "The user already exists");
   }
 
-  protected throwUserNotFound(): Error {
+  protected throwUserNotFound(): ErrorReturn {
     return this.throwError(404, "User not found");
   }
 
-  protected throwInvalidPassword(): Error {
+  protected throwInvalidPassword(): ErrorReturn {
     return this.throwError(401, "Password is not correct");
   }
 
-  private throwError(statusCode: number, errorMessage: string): Error {
+  private throwError(statusCode: number, errorMessage: string): ErrorReturn {
     this.res.status(statusCode).send(errorMessage);
+    if (this.isUnexpectedErrorThrown) throw new Error(errorMessage);
     this.isUnexpectedErrorThrown = true;
-    throw new Error(errorMessage);
   }
 
   protected abstract sendSuccessResponse(...params: any): void;
