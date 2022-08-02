@@ -22,14 +22,14 @@ export class AuthorizationController extends AuthController {
   protected async exec() {
     this.checkHttpMethod("POST");
     const { name, password } = this.getBody<CredentialsBody>();
-    const { _id, password: dbPassword } = (await this.checkUserExistance(
+    const { _id, password: dbPassword } = (await this.lookUpForUser(
       name
     )) as UserDocument;
     await this.checkPassword(password, dbPassword);
     await this.sendSuccessResponse(_id.toString());
   }
 
-  private async checkUserExistance(name: string) {
+  private async lookUpForUser(name: string) {
     const foundUser = await User.findByName(name);
     if (!foundUser) this.throwUserNotFound();
     return foundUser;
