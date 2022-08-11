@@ -1,61 +1,12 @@
-import bcrypt from "bcrypt";
-import mongoose from "mongoose";
-
 import { AuthorizationController } from "src/controllers/auth";
-import User from "src/models/User";
 
-interface StatusObject {
-  status: number;
-}
+import {
+  AuthControllerTestingUtils,
+  StatusObject
+} from "./AuthControllerTestingUtils";
 
-const credentials = {
-  name: "test-user-name",
-  password: "some-test-password"
-};
-
-const req = {
-  method: "POST",
-  body: credentials
-} as any;
-
-const res = {
-  removeHeader: () => res,
-  setHeader: () => res,
-  status: () => res,
-  json: () => res,
-  send: () => res
-} as any;
-
-function statusSetter(statusObject: StatusObject) {
-  return (statusCode: number) => {
-    statusObject.status = statusCode;
-    return res;
-  };
-}
-
-async function execMongodbOperation(func: () => Promise<void>) {
-  await mongoose.connect(process.env.MONGODB_HOST as string);
-  await func();
-  await mongoose.disconnect();
-}
-
-async function createUser() {
-  await execMongodbOperation(async () => {
-    const { name, password } = credentials;
-    const newUser = new User({
-      name,
-      password: await bcrypt.hash(password, 10)
-    });
-    await newUser.save();
-  });
-}
-
-async function deleteUser() {
-  await execMongodbOperation(async () => {
-    const { name } = credentials;
-    await User.deleteByName(name);
-  });
-}
+const { deleteUser, createUser, res, statusSetter, credentials, postReq } =
+  AuthControllerTestingUtils;
 
 describe("Authorzation controller", () => {
   const { name, password } = credentials;
@@ -73,14 +24,17 @@ describe("Authorzation controller", () => {
     let sO: StatusObject = { status: 200 };
     const testRes = { ...res, status: statusSetter(sO) };
 
-    const controller = new AuthorizationController({ req, res: testRes });
+    const controller = new AuthorizationController({
+      req: postReq,
+      res: testRes
+    });
     await controller.run();
     expect(sO.status).toBe(200);
   });
 
   test("should throw endpoint error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...req, method: "GET" };
+    const testReq = { ...postReq, method: "GET" };
     const testRes = { ...res, status: statusSetter(sO) };
 
     const controller = new AuthorizationController({
@@ -94,7 +48,10 @@ describe("Authorzation controller", () => {
   test("should throw user doesn't exist error", async () => {
     let sO: StatusObject = { status: 200 };
     const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...req, body: { name: String(Math.random()), password } };
+    const testReq = {
+      ...postReq,
+      body: { name: String(Math.random()), password }
+    };
 
     const controller = new AuthorizationController({
       req: testReq,
@@ -109,7 +66,7 @@ describe("Authorzation controller", () => {
     await createUser();
     let sO: StatusObject = { status: 200 };
     const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...req, body: { password } };
+    const testReq = { ...postReq, body: { password } };
 
     const controller = new AuthorizationController({
       req: testReq,
@@ -124,7 +81,7 @@ describe("Authorzation controller", () => {
     await createUser();
     let sO: StatusObject = { status: 200 };
     const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...req, body: { name } };
+    const testReq = { ...postReq, body: { name } };
 
     const controller = new AuthorizationController({
       req: testReq,
