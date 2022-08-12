@@ -31,11 +31,6 @@ describe("Refresh access controller", () => {
     await deleteUser();
   });
 
-  afterAll(async () => {
-    await deleteRefreshToken();
-    await deleteUser();
-  });
-
   test("should successfully update refresh token", async () => {
     let sO: StatusObject = { status: 200 };
     const testRes = { ...res, status: statusSetter(sO) };
