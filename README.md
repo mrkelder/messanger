@@ -69,7 +69,7 @@ To run a script use `npm run <script_name>` construction. Here's a list of all a
 - **test:all** - runs all the **test:\*** scripts listed below
 - **test:utils** - runs all tests in **src/utils** directory
 - **test:components** - runs all tests in **src/components** directory
-- **test:api** - runs all tests in **\_\_test\_\_/api** directory
+- **test:controllers** - runs all tests in **\_\_test\_\_/controllers** directory
 
 ## Architecture
 
