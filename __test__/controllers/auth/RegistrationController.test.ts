@@ -36,7 +36,7 @@ describe("Registration controller", () => {
     });
     await controller.run();
 
-    const registratedUser = (await findUser(name)) as UserDocument;
+    const registratedUser = (await findUser()) as UserDocument;
 
     expect(sO.status).toBe(200);
     expect(registratedUser.name).toBe(name);

@@ -74,10 +74,10 @@ export class AuthControllerTestingUtils {
     );
   }
 
-  public static async findUser(name: string): Promise<UserDocument | void> {
+  public static async findUser(): Promise<UserDocument | void> {
     return await AuthControllerTestingUtils.execMongodbOperation<UserDocument | void>(
       async () => {
-        return await User.findByName(name);
+        return await User.findByName(AuthControllerTestingUtils.name);
       }
     );
   }
