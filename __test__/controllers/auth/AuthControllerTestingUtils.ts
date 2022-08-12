@@ -9,49 +9,61 @@ export interface StatusObject {
   status: number;
 }
 
+interface Credentials {
+  name: string;
+  password: string;
+}
+
+interface PostReq {
+  method: "POST";
+  body: { [key: string]: any };
+}
+
+interface PutReq {
+  method: "PUT";
+  cookies: { [key: string]: any };
+}
+
 export class AuthControllerTestingUtils {
-  public static credentials = {
-    name: "test-user-name",
-    password: "some-test-password"
-  };
+  public credentials: Credentials;
+  public postReq: PostReq;
+  public putReq: PutReq;
 
-  public static postReq = {
-    method: "POST",
-    body: AuthControllerTestingUtils.credentials
+  public res = {
+    removeHeader: () => this.res,
+    setHeader: () => this.res,
+    status: () => this.res,
+    json: () => this.res,
+    send: () => this.res
   } as any;
 
-  public static putReq = {
-    method: "PUT",
-    cookies: {}
-  } as any;
+  constructor(name: Credentials["name"]) {
+    this.credentials = {
+      name: `test-${name}`,
+      password: "some-test-password"
+    };
 
-  public static res = {
-    removeHeader: () => AuthControllerTestingUtils.res,
-    setHeader: () => AuthControllerTestingUtils.res,
-    status: () => AuthControllerTestingUtils.res,
-    json: () => AuthControllerTestingUtils.res,
-    send: () => AuthControllerTestingUtils.res
-  } as any;
+    this.postReq = { method: "POST", body: this.credentials };
+    this.putReq = { method: "PUT", cookies: {} };
+  }
 
-  public static statusSetter(statusObject: StatusObject) {
+  public statusSetter(statusObject: StatusObject) {
     return (statusCode: number) => {
       statusObject.status = statusCode;
-      return AuthControllerTestingUtils.res;
+      return this.res;
     };
   }
 
-  public static async execMongodbOperation<T>(
-    func: () => Promise<T>
-  ): Promise<T> {
+  public async execMongodbOperation<T>(func: () => Promise<T>): Promise<T> {
     await mongoose.connect(process.env.MONGODB_HOST as string);
     const result = await func();
     await mongoose.disconnect();
     return result;
   }
 
-  public static async createUser() {
-    await AuthControllerTestingUtils.execMongodbOperation(async () => {
-      const { name, password } = AuthControllerTestingUtils.credentials;
+  public async createUser() {
+    await this.execMongodbOperation(async () => {
+      const { name, password } = this.credentials;
       const newUser = new User({
         name,
         password: await bcrypt.hash(password, 10)
@@ -60,51 +72,43 @@ export class AuthControllerTestingUtils {
     });
   }
 
-  public static async createRefreshToken(userId: string) {
-    return await AuthControllerTestingUtils.execMongodbOperation<string>(
-      async () => {
-        const newToken = new RefreshToken({
-          token: JWT.createRefreshToken(userId),
-          userId
-        });
-        await newToken.save();
+  public async createRefreshToken(userId: string) {
+    return await this.execMongodbOperation<string>(async () => {
+      const newToken = new RefreshToken({
+        token: JWT.createRefreshToken(userId),
+        userId
+      });
+      await newToken.save();
 
-        return newToken.token;
-      }
-    );
+      return newToken.token;
+    });
   }
 
-  public static async findUser(): Promise<UserDocument | void> {
-    return await AuthControllerTestingUtils.execMongodbOperation<UserDocument | void>(
-      async () => {
-        return await User.findByName(
-          AuthControllerTestingUtils.credentials.name
-        );
-      }
-    );
+  public async findUser(): Promise<UserDocument | void> {
+    return await this.execMongodbOperation<UserDocument | void>(async () => {
+      return await User.findByName(this.credentials.name);
+    });
   }
 
-  public static async retrieveUserId() {
-    return await AuthControllerTestingUtils.execMongodbOperation<string>(
-      async () => {
-        const { name } = AuthControllerTestingUtils.credentials;
-        const user = (await User.findByName(name)) as UserDocument;
+  public async retrieveUserId() {
+    return await this.execMongodbOperation<string>(async () => {
+      const { name } = this.credentials;
+      const user = (await User.findByName(name)) as UserDocument;
 
-        return user.id;
-      }
-    );
+      return user.id;
+    });
   }
 
-  public static async deleteUser() {
-    await AuthControllerTestingUtils.execMongodbOperation(async () => {
-      const { name } = AuthControllerTestingUtils.credentials;
+  public async deleteUser() {
+    await this.execMongodbOperation(async () => {
+      const { name } = this.credentials;
       await User.deleteByName(name);
     });
   }
 
-  public static async deleteRefreshToken() {
-    await AuthControllerTestingUtils.execMongodbOperation(async () => {
-      const { name } = AuthControllerTestingUtils.credentials;
+  public async deleteRefreshToken() {
+    await this.execMongodbOperation(async () => {
+      const { name } = this.credentials;
       const user = (await User.findByName(name)) as UserDocument;
       await RefreshToken.deleteByUserId(user.id);
     });

@@ -5,27 +5,26 @@ import {
   StatusObject
 } from "./AuthControllerTestingUtils";
 
-const { deleteUser, createUser, res, statusSetter, credentials, postReq } =
-  AuthControllerTestingUtils;
+const testUtils = new AuthControllerTestingUtils("authorizatoin-test");
 
 describe("Authorzation controller", () => {
-  const { name, password } = credentials;
+  const { name, password } = testUtils.credentials;
 
   beforeEach(async () => {
-    await deleteUser();
+    await testUtils.deleteUser();
   });
 
   afterAll(async () => {
-    await deleteUser();
+    await testUtils.deleteUser();
   });
 
   test("should authorizate user", async () => {
-    await createUser();
+    await testUtils.createUser();
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
 
     const controller = new AuthorizationController({
-      req: postReq,
+      req: testUtils.postReq as any,
       res: testRes
     });
     await controller.run();
@@ -34,11 +33,11 @@ describe("Authorzation controller", () => {
 
   test("should throw endpoint error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...postReq, method: "GET" };
-    const testRes = { ...res, status: statusSetter(sO) };
+    const testReq = { ...testUtils.postReq, method: "GET" };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
 
     const controller = new AuthorizationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -47,14 +46,14 @@ describe("Authorzation controller", () => {
 
   test("should throw user doesn't exist error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
     const testReq = {
-      ...postReq,
+      ...testUtils.postReq,
       body: { name: String(Math.random()), password }
     };
 
     const controller = new AuthorizationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -63,13 +62,13 @@ describe("Authorzation controller", () => {
   });
 
   test("should throw unprovided name error", async () => {
-    await createUser();
+    await testUtils.createUser();
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...postReq, body: { password } };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const testReq = { ...testUtils.postReq, body: { password } };
 
     const controller = new AuthorizationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -78,13 +77,13 @@ describe("Authorzation controller", () => {
   });
 
   test("should throw unprovided password error", async () => {
-    await createUser();
+    await testUtils.createUser();
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...postReq, body: { name } };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const testReq = { ...testUtils.postReq, body: { name } };
 
     const controller = new AuthorizationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();

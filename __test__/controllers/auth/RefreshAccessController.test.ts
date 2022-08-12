@@ -6,39 +6,32 @@ import {
   StatusObject
 } from "./AuthControllerTestingUtils";
 
-const {
-  deleteUser,
-  createUser,
-  deleteRefreshToken,
-  res,
-  putReq,
-  statusSetter,
-  createRefreshToken,
-  retrieveUserId
-} = AuthControllerTestingUtils;
+const testUtils = new AuthControllerTestingUtils("refresh-access-test");
 
 describe("Refresh access controller", () => {
   beforeAll(async () => {
-    await deleteUser();
+    await testUtils.deleteUser();
   });
 
   beforeEach(async () => {
-    await createUser();
+    await testUtils.createUser();
   });
 
   afterEach(async () => {
-    await deleteRefreshToken();
-    await deleteUser();
+    await testUtils.deleteRefreshToken();
+    await testUtils.deleteUser();
   });
 
   test("should successfully update refresh token", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const refreshToken = await createRefreshToken(await retrieveUserId());
-    const reqWithToken = { ...putReq, cookies: { refreshToken } };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const refreshToken = await testUtils.createRefreshToken(
+      await testUtils.retrieveUserId()
+    );
+    const reqWithToken = { ...testUtils.putReq, cookies: { refreshToken } };
 
     const controller = new RefreshAccessController({
-      req: reqWithToken,
+      req: reqWithToken as any,
       res: testRes
     });
 
@@ -49,12 +42,14 @@ describe("Refresh access controller", () => {
 
   test("should throw token error because token does not exist in db", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const refreshToken = JWT.createRefreshToken(await retrieveUserId());
-    const reqWithToken = { ...putReq, cookies: { refreshToken } };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const refreshToken = JWT.createRefreshToken(
+      await testUtils.retrieveUserId()
+    );
+    const reqWithToken = { ...testUtils.putReq, cookies: { refreshToken } };
 
     const controller = new RefreshAccessController({
-      req: reqWithToken,
+      req: reqWithToken as any,
       res: testRes
     });
 
@@ -65,14 +60,14 @@ describe("Refresh access controller", () => {
 
   test("should throw token error because of an invalid token", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
     const reqWithToken = {
-      ...putReq,
+      ...testUtils.putReq,
       cookies: { refreshToken: "xxx.yyy.zzz" }
     };
 
     const controller = new RefreshAccessController({
-      req: reqWithToken,
+      req: reqWithToken as any,
       res: testRes
     });
 
@@ -83,10 +78,10 @@ describe("Refresh access controller", () => {
 
   test("should throw http method error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...putReq, method: "POST" };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const testReq = { ...testUtils.putReq, method: "POST" };
     const controller = new RefreshAccessController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
 

@@ -6,37 +6,29 @@ import {
   StatusObject
 } from "./AuthControllerTestingUtils";
 
-const {
-  deleteUser,
-  createUser,
-  res,
-  statusSetter,
-  credentials,
-  postReq,
-  findUser
-} = AuthControllerTestingUtils;
+const testUtils = new AuthControllerTestingUtils("registration-test");
 
 describe("Registration controller", () => {
-  const { name, password } = credentials;
+  const { name, password } = testUtils.credentials;
 
   beforeEach(async () => {
-    await deleteUser();
+    await testUtils.deleteUser();
   });
 
   afterAll(async () => {
-    await deleteUser();
+    await testUtils.deleteUser();
   });
 
   test("should successfully registrate a user", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
     const controller = new RegistrationController({
-      req: postReq,
+      req: testUtils.postReq as any,
       res: testRes
     });
     await controller.run();
 
-    const registratedUser = (await findUser()) as UserDocument;
+    const registratedUser = (await testUtils.findUser()) as UserDocument;
 
     expect(sO.status).toBe(200);
     expect(registratedUser.name).toBe(name);
@@ -44,10 +36,10 @@ describe("Registration controller", () => {
 
   test("should throw endpoint error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...res, status: statusSetter(sO) };
-    const testReq = { ...postReq, method: "GET" };
+    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const testReq = { ...testUtils.postReq, method: "GET" };
     const controller = new RegistrationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -57,13 +49,13 @@ describe("Registration controller", () => {
 
   test("should throw unprovided name error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...postReq, body: { password } };
+    const testReq = { ...testUtils.postReq, body: { password } };
     const testRes = {
-      ...res,
-      status: statusSetter(sO)
+      ...testUtils.res,
+      status: testUtils.statusSetter(sO)
     };
     const controller = new RegistrationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -73,13 +65,13 @@ describe("Registration controller", () => {
 
   test("should throw unprovided password error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...postReq, body: { name } };
+    const testReq = { ...testUtils.postReq, body: { name } };
     const testRes = {
-      ...res,
-      status: statusSetter(sO)
+      ...testUtils.res,
+      status: testUtils.statusSetter(sO)
     };
     const controller = new RegistrationController({
-      req: testReq,
+      req: testReq as any,
       res: testRes
     });
     await controller.run();
@@ -88,14 +80,14 @@ describe("Registration controller", () => {
   });
 
   test("should throw user already exists error", async () => {
-    await createUser();
+    await testUtils.createUser();
     let sO: StatusObject = { status: 200 };
     const testRes = {
-      ...res,
-      status: statusSetter(sO)
+      ...testUtils.res,
+      status: testUtils.statusSetter(sO)
     };
     const controller = new RegistrationController({
-      req: postReq,
+      req: testUtils.postReq as any,
       res: testRes
     });
     await controller.run();
