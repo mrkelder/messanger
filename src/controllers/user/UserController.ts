@@ -1,9 +1,12 @@
+import mongoose from "mongoose";
 import { NextApiRequest, NextApiResponse } from "next";
 
 import JWT from "src/utils/JWT";
 import RequestHelper from "src/utils/RequestHelper";
 
 type AuthHttpMethods = "GET" | "POST";
+
+type ExecMethod = (...params: any) => Promise<void>;
 
 type ErrorReturn = Error | void;
 
@@ -26,12 +29,32 @@ export abstract class UserController {
     this.res = res;
   }
 
-  protected async verifyToken(): Promise<void> {
+  protected async setUp(execMethod: ExecMethod) {
+    try {
+      const userId = (await this.checkAccessToken()) as string;
+      await this.connectToDb();
+      await execMethod(userId);
+    } catch {
+      if (!this.isUnexpectedErrorThrown) this.throwServerError();
+    } finally {
+      await this.disconnectFromDb();
+    }
+  }
+
+  protected async connectToDb() {
+    await mongoose.connect(process.env.MONGODB_HOST as string);
+  }
+
+  protected async disconnectFromDb() {
+    if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+  }
+
+  protected async checkAccessToken(): Promise<string | ErrorReturn> {
     try {
       const tokenData = JWT.verifyAccessToken(this.accessToken);
-      await this.sendSuccessResponse(tokenData._id);
+      return tokenData._id;
     } catch {
-      this.throwExpiredToken();
+      return this.throwExpiredToken();
     }
   }
 
@@ -42,12 +65,16 @@ export abstract class UserController {
     }
   }
 
-  protected throwHttpMethod(): ErrorReturn {
+  protected throwServerError(): ErrorReturn {
+    return this.throwError(500, "Server could not handle the request");
+  }
+
+  protected throwHttpMethod() {
     return this.throwError(405, "Unacceptable http method");
   }
 
-  protected throwInvalidUserName() {
-    return this.throwError(500, "User name is not specified");
+  protected throwInvalidPeerId() {
+    return this.throwError(500, "Such user does not exist");
   }
 
   protected throwUnspecifiedToken() {
@@ -56,10 +83,6 @@ export abstract class UserController {
 
   protected throwExpiredToken() {
     return this.throwError(403, "Access token is expired");
-  }
-
-  protected throwDatabase() {
-    return this.throwError(503, "Database is not available at the moment");
   }
 
   protected throwUserNotFound() {
@@ -73,5 +96,7 @@ export abstract class UserController {
   }
 
   protected abstract sendSuccessResponse(...params: any): void;
-  protected abstract exec(): unknown;
+  protected abstract exec(
+    ...params: Parameters<ExecMethod>
+  ): ReturnType<ExecMethod>;
 }
