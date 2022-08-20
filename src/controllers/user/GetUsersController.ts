@@ -31,7 +31,7 @@ export class GetUsersController extends UserController {
     const data = await User.find(
       {
         _id: { $ne: new mongoose.Types.ObjectId(userId) },
-        name: { $regex: userName }
+        name: { $regex: userName, $options: "i" }
       },
       { password: 0, __v: 0 }
     );
