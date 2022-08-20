@@ -16,7 +16,7 @@ export class CreateChatController extends UserController {
   }
 
   protected async exec(userId: string): Promise<void> {
-    const peerId = this.requestHelper.getBody() as string;
+    const peerId = this.requestHelper.getBody().peerId as string;
     this.checkHttpMethod("POST");
     await this.checkPeerId(peerId);
     const chatId = await this.createChat(userId, peerId);
