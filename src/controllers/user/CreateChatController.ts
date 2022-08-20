@@ -20,7 +20,7 @@ export class CreateChatController extends UserController {
     this.checkHttpMethod("POST");
     await this.checkPeerId(peerId);
     const chatId = await this.createChat(userId, peerId);
-    this.sendSuccessResponse(chatId);
+    this.sendResponse(chatId);
   }
 
   private async checkPeerId(peerId: string): Promise<Error | void> {
@@ -45,7 +45,7 @@ export class CreateChatController extends UserController {
     } else return results[0].id;
   }
 
-  protected sendSuccessResponse(chatId: string): void {
+  protected sendResponse(chatId: string): void {
     this.res.json({
       chatId
     });

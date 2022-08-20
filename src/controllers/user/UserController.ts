@@ -95,7 +95,7 @@ export abstract class UserController {
     this.isUnexpectedErrorThrown = true;
   }
 
-  protected abstract sendSuccessResponse(...params: any): void;
+  protected abstract sendResponse(...params: any): void;
   protected abstract exec(
     ...params: Parameters<ExecMethod>
   ): ReturnType<ExecMethod>;

@@ -18,7 +18,7 @@ export class GetChatsController extends UserController {
   protected async exec(userId: string): Promise<void> {
     this.checkHttpMethod("GET");
     const chats = await this.getChats(userId);
-    this.sendSuccessResponse(chats);
+    this.sendResponse(chats);
   }
 
   private async getChats(userId: string): Promise<ChatType[]> {
@@ -68,7 +68,7 @@ export class GetChatsController extends UserController {
     return data;
   }
 
-  protected sendSuccessResponse(chats: ChatType[]): void {
+  protected sendResponse(chats: ChatType[]): void {
     this.res.json(chats);
   }
 }

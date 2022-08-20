@@ -21,7 +21,7 @@ export class GetUsersController extends UserController {
     const { userName } = this.req.query;
     this.checkHttpMethod("GET");
     const users = await this.getUsers(userId, userName as string);
-    this.sendSuccessResponse(users);
+    this.sendResponse(users);
   }
 
   private async getUsers(
@@ -39,7 +39,7 @@ export class GetUsersController extends UserController {
     return data;
   }
 
-  protected sendSuccessResponse(users: UserWithoutPassword[]): void {
+  protected sendResponse(users: UserWithoutPassword[]): void {
     if (users.length > 0) this.res.json(users);
     else this.throwUserNotFound();
   }
