@@ -24,7 +24,7 @@ export abstract class UserController {
 
   constructor({ req, res }: AuthControllerInput) {
     this.requestHelper = new RequestHelper(req);
-    this.accessToken = this.requestHelper.getBody().accessToken;
+    this.accessToken = req.cookies.accessToken as string;
     this.req = req;
     this.res = res;
   }
