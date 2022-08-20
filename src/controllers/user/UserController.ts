@@ -6,7 +6,7 @@ import RequestHelper from "src/utils/RequestHelper";
 
 type AuthHttpMethods = "GET" | "POST";
 
-type ExecMethod = (...params: any) => Promise<void>;
+type ExecMethod = (userId: string) => Promise<void>;
 
 type ErrorReturn = Error | void;
 
