@@ -62,6 +62,7 @@ export class AuthControllerTestingUtils {
   }
 
   public async createUser() {
+    // TODO: make it more flexible
     await this.execMongodbOperation(async () => {
       const { name, password } = this.credentials;
       const newUser = new User({

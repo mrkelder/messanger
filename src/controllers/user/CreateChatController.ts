@@ -18,14 +18,23 @@ export class CreateChatController extends UserController {
   protected async exec(userId: string): Promise<void> {
     const peerId = this.requestHelper.getBody().peerId as string;
     this.checkHttpMethod("POST");
-    await this.checkPeerId(peerId);
+    await this.checkUser(userId);
+    await this.checkPeerId(userId, peerId);
     const chatId = await this.createChat(userId, peerId);
     this.sendResponse(chatId);
   }
 
-  private async checkPeerId(peerId: string): Promise<Error | void> {
+  private async checkUser(userId: string): Promise<Error | void> {
+    const user = await User.findById(userId);
+    if (!user) return this.throwUserNotFound();
+  }
+
+  private async checkPeerId(
+    userId: string,
+    peerId: string
+  ): Promise<Error | void> {
     const peerUser = await User.findById(peerId);
-    if (!peerUser) return this.throwInvalidPeerId();
+    if (!peerUser || userId === peerId) return this.throwInvalidPeerId();
   }
 
   private async createChat(userId: string, peerId: string): Promise<string> {

@@ -34,7 +34,7 @@ export abstract class UserController {
       const userId = (await this.checkAccessToken()) as string;
       await this.connectToDb();
       await execMethod(userId);
-    } catch {
+    } catch (e) {
       if (!this.isUnexpectedErrorThrown) this.throwServerError();
     } finally {
       await this.disconnectFromDb();
@@ -50,11 +50,12 @@ export abstract class UserController {
   }
 
   protected async checkAccessToken(): Promise<string | ErrorReturn> {
+    if (!this.accessToken) this.throwInvalidToken();
     try {
       const tokenData = JWT.verifyAccessToken(this.accessToken);
       return tokenData._id;
     } catch {
-      return this.throwExpiredToken();
+      this.throwInvalidToken();
     }
   }
 
@@ -66,27 +67,23 @@ export abstract class UserController {
   }
 
   protected throwServerError(): ErrorReturn {
-    return this.throwError(500, "Server could not handle the request");
+    this.throwError(500, "Server could not handle the request");
   }
 
   protected throwHttpMethod() {
-    return this.throwError(405, "Unacceptable http method");
+    this.throwError(405, "Unacceptable http method");
   }
 
   protected throwInvalidPeerId() {
-    return this.throwError(500, "Such user does not exist");
+    this.throwError(400, "Peer id is invalid");
   }
 
-  protected throwUnspecifiedToken() {
-    return this.throwError(401, "Access token is not specified");
-  }
-
-  protected throwExpiredToken() {
-    return this.throwError(403, "Access token is expired");
+  protected throwInvalidToken() {
+    this.throwError(403, "Access token is expired");
   }
 
   protected throwUserNotFound() {
-    return this.throwError(404, "Users not found");
+    this.throwError(404, "Users not found");
   }
 
   protected throwError(statusCode: number, errorMessage: string): ErrorReturn {
