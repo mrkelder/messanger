@@ -14,18 +14,25 @@ interface Credentials {
   password: string;
 }
 
+interface GetReq {
+  method: "GET";
+  cookies?: { [key: string]: any };
+}
+
 interface PostReq {
   method: "POST";
   body: { [key: string]: any };
+  cookies?: { [key: string]: any };
 }
 
 interface PutReq {
   method: "PUT";
-  cookies: { [key: string]: any };
+  cookies?: { [key: string]: any };
 }
 
 export class AuthControllerTestingUtils {
   public credentials: Credentials;
+  public getReq: GetReq;
   public postReq: PostReq;
   public putReq: PutReq;
 
@@ -43,6 +50,7 @@ export class AuthControllerTestingUtils {
       password: "some-test-password"
     };
 
+    this.getReq = { method: "GET" };
     this.postReq = { method: "POST", body: this.credentials };
     this.putReq = { method: "PUT", cookies: {} };
   }
