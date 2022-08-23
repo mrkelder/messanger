@@ -40,6 +40,14 @@ async function getChat(userId: string, peerId: string): Promise<DatabaseChat> {
   });
 }
 
+async function deleteChat(userId: string) {
+  return execMongodbOperation(async () => {
+    await Chat.deleteOne({
+      members: { $in: [new mongoose.Types.ObjectId(userId)] }
+    });
+  });
+}
+
 const testUser = new AuthControllerTestingUtils("create-chat-controller-user");
 const testPeer = new AuthControllerTestingUtils("create-chat-controller-peer");
 
@@ -74,6 +82,7 @@ describe("Create chat controller", () => {
 
     expect(await getChat(userId, peerId)).toBeDefined();
     expect(sO.status).toBe(200);
+    await deleteChat(userId);
   });
 
   test("Should throw an error because user does not exist", async () => {
@@ -98,7 +107,7 @@ describe("Create chat controller", () => {
     expect(sO.status).toBe(404);
   });
 
-  test("Should throw an user not found because of an invalid accessToken", async () => {
+  test("Should throw an error because of an invalid accessToken", async () => {
     let sO: StatusObject = { status: 200 };
     const peerId = await getUserId(testPeer.credentials.name);
 
@@ -116,7 +125,7 @@ describe("Create chat controller", () => {
     });
 
     await controller.run();
-    expect(sO.status).toBe(404);
+    expect(sO.status).toBe(403);
   });
 
   test("Should throw an error because the user and peer ids are equal", async () => {
@@ -180,35 +189,41 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because of multiple peer ids", async () => {
     let sO: StatusObject = { status: 200 };
-    const userId = await getUserId(testUser.credentials.name);
-    const peerId = await getUserId(testPeer.credentials.name);
+    try {
+      const userId = await getUserId(testUser.credentials.name);
+      const peerId = await getUserId(testPeer.credentials.name);
 
-    const testRes = { ...testUser.res, status: testUser.statusSetter(sO) };
-    const testReq = {
-      ...testPeer.postReq,
-      cookies: {
-        accessToken: JWT.createAccessToken(userId)
-      },
-      body: { peerId: [peerId, peerId] }
-    };
-    const controller = new CreateChatController({
-      req: testReq as any,
-      res: testRes as any
-    });
+      const testRes = { ...testUser.res, status: testUser.statusSetter(sO) };
+      const testReq = {
+        ...testPeer.postReq,
+        cookies: {
+          accessToken: JWT.createAccessToken(userId)
+        },
+        body: { peerId: [peerId, peerId] }
+      };
+      const controller = new CreateChatController({
+        req: testReq as any,
+        res: testRes as any
+      });
 
-    await controller.run();
-    expect(sO.status).toBe(500);
+      await controller.run();
+    } catch {
+      expect(sO.status).toBe(500);
+    } finally {
+      expect(sO.status).toBe(500);
+    }
   });
 
   test("Should throw an error because of an invalid http method", async () => {
     let sO: StatusObject = { status: 200 };
+    const userId = await getUserId(testUser.credentials.name);
 
     const testRes = { ...testUser.res, status: testUser.statusSetter(sO) };
     const testReq = {
       ...testPeer.postReq,
       method: "DELETE",
       cookies: {
-        accessToken: "x.x.x"
+        accessToken: JWT.createAccessToken(userId)
       },
       body: {}
     };

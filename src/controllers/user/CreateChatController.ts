@@ -26,7 +26,7 @@ export class CreateChatController extends UserController {
 
   private async checkUser(userId: string): Promise<Error | void> {
     const user = await User.findById(userId);
-    if (!user) return this.throwUserNotFound();
+    if (!user) this.throwUserNotFound();
   }
 
   private async checkPeerId(
@@ -34,7 +34,7 @@ export class CreateChatController extends UserController {
     peerId: string
   ): Promise<Error | void> {
     const peerUser = await User.findById(peerId);
-    if (!peerUser || userId === peerId) return this.throwInvalidPeerId();
+    if (!peerUser || userId === peerId) this.throwInvalidPeerId();
   }
 
   private async createChat(userId: string, peerId: string): Promise<string> {

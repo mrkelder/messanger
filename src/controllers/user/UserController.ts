@@ -34,7 +34,7 @@ export abstract class UserController {
       const userId = (await this.checkAccessToken()) as string;
       await this.connectToDb();
       await execMethod(userId);
-    } catch (e) {
+    } catch {
       if (!this.isUnexpectedErrorThrown) this.throwServerError();
     } finally {
       await this.disconnectFromDb();
@@ -62,7 +62,6 @@ export abstract class UserController {
   protected checkHttpMethod(method: AuthHttpMethods): void | Error {
     if (!this.requestHelper[`is${method}`]()) {
       this.throwHttpMethod();
-      throw new Error();
     }
   }
 
@@ -88,8 +87,8 @@ export abstract class UserController {
 
   protected throwError(statusCode: number, errorMessage: string): ErrorReturn {
     this.res.status(statusCode).send(errorMessage);
-    if (this.isUnexpectedErrorThrown) throw new Error(errorMessage);
     this.isUnexpectedErrorThrown = true;
+    throw new Error(errorMessage);
   }
 
   protected abstract sendResponse(...params: any): void;
