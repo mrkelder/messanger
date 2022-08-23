@@ -62,6 +62,13 @@ export class AuthControllerTestingUtils {
     };
   }
 
+  public resultDataSetter(statusObject: any) {
+    return (data: any) => {
+      statusObject.data = data;
+      return this.res;
+    };
+  }
+
   public async execMongodbOperation<T>(func: () => Promise<T>): Promise<T> {
     await mongoose.connect(process.env.MONGODB_HOST as string);
     const result = await func();
