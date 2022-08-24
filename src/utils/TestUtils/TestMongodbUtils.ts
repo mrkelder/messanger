@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
-import Chat from "src/models/Chat";
 
+import Chat from "src/models/Chat";
 import RefreshToken from "src/models/RefreshToken";
 import User, { UserDocument } from "src/models/User";
 import { DatabaseChat } from "src/types/db";
@@ -17,6 +17,15 @@ export class TestMongodbUtils {
     const result = await func();
     await mongoose.disconnect();
     return result;
+  }
+
+  public static async createChat(userId: string) {
+    return this.execMongodbOperation(async () => {
+      const newChat = new Chat({
+        members: new mongoose.Types.ObjectId(userId)
+      });
+      await newChat.save();
+    });
   }
 
   public static async createUser(credentials: Credentials): Promise<string> {
@@ -45,15 +54,17 @@ export class TestMongodbUtils {
 
   public static async getChat(
     userId: string,
-    peerId: string
+    peerId?: string
   ): Promise<DatabaseChat> {
     return this.execMongodbOperation<DatabaseChat>(async () => {
       const chats = await Chat.find({
         members: {
-          $in: [
-            new mongoose.Types.ObjectId(userId),
-            new mongoose.Types.ObjectId(peerId)
-          ]
+          $in: peerId
+            ? [
+                new mongoose.Types.ObjectId(userId),
+                new mongoose.Types.ObjectId(peerId)
+              ]
+            : [new mongoose.Types.ObjectId(userId)]
         }
       });
 
