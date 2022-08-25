@@ -79,15 +79,19 @@ describe("Authorzation controller", () => {
   test("should throw unprovided password error", async () => {
     await testUtils.createUser();
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const testReq = { ...testUtils.postReq, body: { name } };
+    try {
+      const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+      const testReq = { ...testUtils.postReq, body: { name } };
 
-    const controller = new AuthorizationController({
-      req: testReq as any,
-      res: testRes
-    });
-    await controller.run();
-
-    expect(sO.status).toBe(500);
+      const controller = new AuthorizationController({
+        req: testReq as any,
+        res: testRes
+      });
+      await controller.run();
+    } catch {
+      expect(sO.status).toBe(500);
+    } finally {
+      expect(sO.status).toBe(500);
+    }
   });
 });

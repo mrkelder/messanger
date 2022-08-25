@@ -104,10 +104,10 @@ export abstract class AuthController {
     return this.throwError(401, "Password is not correct");
   }
 
-  private throwError(statusCode: number, errorMessage: string): ErrorReturn {
+  protected throwError(statusCode: number, errorMessage: string): ErrorReturn {
     this.res.status(statusCode).send(errorMessage);
-    if (this.isUnexpectedErrorThrown) throw new Error(errorMessage);
     this.isUnexpectedErrorThrown = true;
+    throw new Error(errorMessage);
   }
 
   protected abstract sendSuccessResponse(...params: any): void;

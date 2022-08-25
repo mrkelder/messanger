@@ -49,34 +49,42 @@ describe("Registration controller", () => {
 
   test("should throw unprovided name error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...testUtils.postReq, body: { password } };
-    const testRes = {
-      ...testUtils.res,
-      status: testUtils.statusSetter(sO)
-    };
-    const controller = new RegistrationController({
-      req: testReq as any,
-      res: testRes
-    });
-    await controller.run();
-
-    expect(sO.status).toBe(500);
+    try {
+      const testReq = { ...testUtils.postReq, body: { password } };
+      const testRes = {
+        ...testUtils.res,
+        status: testUtils.statusSetter(sO)
+      };
+      const controller = new RegistrationController({
+        req: testReq as any,
+        res: testRes
+      });
+      await controller.run();
+    } catch {
+      expect(sO.status).toBe(500);
+    } finally {
+      expect(sO.status).toBe(500);
+    }
   });
 
   test("should throw unprovided password error", async () => {
     let sO: StatusObject = { status: 200 };
-    const testReq = { ...testUtils.postReq, body: { name } };
-    const testRes = {
-      ...testUtils.res,
-      status: testUtils.statusSetter(sO)
-    };
-    const controller = new RegistrationController({
-      req: testReq as any,
-      res: testRes
-    });
-    await controller.run();
-
-    expect(sO.status).toBe(500);
+    try {
+      const testReq = { ...testUtils.postReq, body: { name } };
+      const testRes = {
+        ...testUtils.res,
+        status: testUtils.statusSetter(sO)
+      };
+      const controller = new RegistrationController({
+        req: testReq as any,
+        res: testRes
+      });
+      await controller.run();
+    } catch {
+      expect(sO.status).toBe(500);
+    } finally {
+      expect(sO.status).toBe(500);
+    }
   });
 
   test("should throw user already exists error", async () => {

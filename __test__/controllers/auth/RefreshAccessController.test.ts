@@ -60,20 +60,24 @@ describe("Refresh access controller", () => {
 
   test("should throw token error because of an invalid token", async () => {
     let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const reqWithToken = {
-      ...testUtils.putReq,
-      cookies: { refreshToken: "xxx.yyy.zzz" }
-    };
+    try {
+      const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+      const reqWithToken = {
+        ...testUtils.putReq,
+        cookies: { refreshToken: "xxx.yyy.zzz" }
+      };
 
-    const controller = new RefreshAccessController({
-      req: reqWithToken as any,
-      res: testRes
-    });
+      const controller = new RefreshAccessController({
+        req: reqWithToken as any,
+        res: testRes
+      });
 
-    await controller.run();
-
-    expect(sO.status).toBe(500);
+      await controller.run();
+    } catch {
+      expect(sO.status).toBe(500);
+    } finally {
+      expect(sO.status).toBe(500);
+    }
   });
 
   test("should throw http method error", async () => {
