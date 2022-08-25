@@ -32,27 +32,27 @@ describe("Authorzation controller", () => {
     });
 
     test("should authorizate user", async () => {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = name;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = name;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
       expect(resultObject.status).toBe(200);
     });
 
     test("should throw unprovided name error", async () => {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
 
@@ -61,13 +61,13 @@ describe("Authorzation controller", () => {
 
     test("should throw unprovided password error", async () => {
       try {
-        const testReq = TestHttpUtils.createRequest("POST");
-        const testRes = TestHttpUtils.createResponse(resultObject);
-        testReq.body.name = name;
+        const req = TestHttpUtils.createRequest("POST");
+        const res = TestHttpUtils.createResponse(resultObject);
+        req.body.name = name;
 
         const controller = new AuthorizationController({
-          req: testReq,
-          res: testRes
+          req,
+          res
         });
         await controller.run();
       } catch {
@@ -80,14 +80,14 @@ describe("Authorzation controller", () => {
 
   describe("Without user creation before the tests", () => {
     test("should throw endpoint error", async () => {
-      const testReq = TestHttpUtils.createRequest("GET");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = name;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("GET");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = name;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
       expect(resultObject.status).toBe(405);
@@ -98,14 +98,14 @@ describe("Authorzation controller", () => {
 
       await TestMongodbUtils.deleteUser(randomName);
 
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = randomName;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = randomName;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
 

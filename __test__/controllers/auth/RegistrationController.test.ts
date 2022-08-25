@@ -22,14 +22,14 @@ describe("Registration controller", () => {
   });
 
   test("should successfully registrate a user", async () => {
-    const testReq = TestHttpUtils.createRequest("POST");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.name = name;
-    testReq.body.password = password;
+    const req = TestHttpUtils.createRequest("POST");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.name = name;
+    req.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
     await controller.run();
 
@@ -45,14 +45,14 @@ describe("Registration controller", () => {
   });
 
   test("should throw http method error", async () => {
-    const testReq = TestHttpUtils.createRequest("GET");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.name = name;
-    testReq.body.password = password;
+    const req = TestHttpUtils.createRequest("GET");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.name = name;
+    req.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
     await controller.run();
 
@@ -61,13 +61,13 @@ describe("Registration controller", () => {
 
   test("should throw unprovided name error", async () => {
     try {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.password = password;
 
       const controller = new RegistrationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
     } catch {
@@ -79,13 +79,13 @@ describe("Registration controller", () => {
 
   test("should throw unprovided password error", async () => {
     try {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = name;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = name;
 
       const controller = new RegistrationController({
-        req: testReq,
-        res: testRes
+        req,
+        res
       });
       await controller.run();
     } catch {
@@ -97,14 +97,14 @@ describe("Registration controller", () => {
 
   test("should throw user already exists error", async () => {
     await TestMongodbUtils.createUser(credentials);
-    const testReq = TestHttpUtils.createRequest("POST");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.name = name;
-    testReq.body.password = password;
+    const req = TestHttpUtils.createRequest("POST");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.name = name;
+    req.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
     await controller.run();
 

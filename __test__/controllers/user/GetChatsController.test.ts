@@ -25,12 +25,12 @@ describe("Chat list", () => {
 
   test("Should successfully fetch chats", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -40,12 +40,12 @@ describe("Chat list", () => {
   });
 
   test("Should throw an error because accessToken is not passed", async () => {
-    const testReq = TestHttpUtils.createRequest("GET");
-    const testRes = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("GET");
+    const res = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -53,13 +53,13 @@ describe("Chat list", () => {
   });
 
   test("Should throw an error because accessToken is invalid", async () => {
-    const testReq = TestHttpUtils.createRequest("GET");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.cookies.accessToken = "xxxxxxx.xxxxxxxxxxx.xxxxxxxxxxxx";
+    const req = TestHttpUtils.createRequest("GET");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.cookies.accessToken = "xxxxxxx.xxxxxxxxxxx.xxxxxxxxxxxx";
 
     const controller = new GetChatsController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -68,12 +68,12 @@ describe("Chat list", () => {
 
   test("Should throw an error because of invalid http method", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();

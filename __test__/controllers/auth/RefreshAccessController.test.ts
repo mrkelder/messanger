@@ -32,13 +32,13 @@ describe("Refresh access controller", () => {
   test("should successfully update refresh token", async () => {
     const { userId } = ids;
     const refreshToken = await TestMongodbUtils.createRefreshToken(userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    const testReq = TestHttpUtils.createRequest("PUT");
-    testReq.cookies.refreshToken = refreshToken;
+    const res = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("PUT");
+    req.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -49,13 +49,13 @@ describe("Refresh access controller", () => {
   test("should throw token error because token does not exist in db", async () => {
     const { userId } = ids;
     const refreshToken = JWT.createRefreshToken(userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    const testReq = TestHttpUtils.createRequest("PUT");
-    testReq.cookies.refreshToken = refreshToken;
+    const res = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("PUT");
+    req.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -64,13 +64,13 @@ describe("Refresh access controller", () => {
   });
 
   test("should throw token error because of an invalid token", async () => {
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    const testReq = TestHttpUtils.createRequest("PUT");
-    testReq.cookies.refreshToken = "xxx.yyy.zzz";
+    const res = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("PUT");
+    req.cookies.refreshToken = "xxx.yyy.zzz";
 
     const controller = new RefreshAccessController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
@@ -80,13 +80,13 @@ describe("Refresh access controller", () => {
   test("should throw http method error", async () => {
     const { userId } = ids;
     const refreshToken = await TestMongodbUtils.createRefreshToken(userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    const testReq = TestHttpUtils.createRequest("POST");
-    testReq.cookies.refreshToken = refreshToken;
+    const res = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("POST");
+    req.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq,
-      res: testRes
+      req,
+      res
     });
 
     await controller.run();
