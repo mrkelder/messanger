@@ -1,92 +1,98 @@
+import { NextApiRequest, NextApiResponse } from "next";
+
 import { RefreshAccessController } from "src/controllers/auth";
 import JWT from "src/utils/JWT";
-
 import {
-  AuthControllerTestingUtils,
-  StatusObject
-} from "./AuthControllerTestingUtils";
+  TestCredentialsUtils,
+  TestHttpUtils,
+  TestMongodbUtils
+} from "src/utils/TestUtils";
 
-const testUtils = new AuthControllerTestingUtils("refresh-access-test");
+const testUser = new TestCredentialsUtils("authorizatoin-test");
+const resultObject = TestHttpUtils.createReultObject();
+
+const ids = {
+  userId: ""
+};
 
 describe("Refresh access controller", () => {
+  const credentials = testUser.getCredentials();
+
   beforeAll(async () => {
-    await testUtils.deleteUser();
+    await TestMongodbUtils.deleteUser(credentials.name);
   });
 
   beforeEach(async () => {
-    await testUtils.createUser();
+    ids.userId = await TestMongodbUtils.createUser(credentials);
   });
 
   afterEach(async () => {
-    await testUtils.deleteRefreshToken();
-    await testUtils.deleteUser();
+    await TestMongodbUtils.deleteRefreshToken(credentials.name);
+    await TestMongodbUtils.deleteUser(credentials.name);
   });
 
   test("should successfully update refresh token", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const refreshToken = await testUtils.createRefreshToken(
-      await testUtils.retrieveUserId()
-    );
-    const reqWithToken = { ...testUtils.putReq, cookies: { refreshToken } };
+    const { userId } = ids;
+    const refreshToken = await TestMongodbUtils.createRefreshToken(userId);
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    const testReq = TestHttpUtils.createRequest("PUT");
+    testReq.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: reqWithToken as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
 
     await controller.run();
 
-    expect(sO.status).toBe(200);
+    expect(resultObject.status).toBe(200);
   });
 
   test("should throw token error because token does not exist in db", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const refreshToken = JWT.createRefreshToken(
-      await testUtils.retrieveUserId()
-    );
-    const reqWithToken = { ...testUtils.putReq, cookies: { refreshToken } };
+    const { userId } = ids;
+    const refreshToken = JWT.createRefreshToken(userId);
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    const testReq = TestHttpUtils.createRequest("PUT");
+    testReq.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: reqWithToken as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
 
     await controller.run();
 
-    expect(sO.status).toBe(401);
+    expect(resultObject.status).toBe(401);
   });
 
   test("should throw token error because of an invalid token", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const reqWithToken = {
-      ...testUtils.putReq,
-      cookies: { refreshToken: "xxx.yyy.zzz" }
-    };
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    const testReq = TestHttpUtils.createRequest("PUT");
+    testReq.cookies.refreshToken = "xxx.yyy.zzz";
 
     const controller = new RefreshAccessController({
-      req: reqWithToken as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
 
     await controller.run();
-
-    expect(sO.status).toBe(500);
+    expect(resultObject.status).toBe(401);
   });
 
   test("should throw http method error", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const testReq = { ...testUtils.putReq, method: "POST" };
+    const { userId } = ids;
+    const refreshToken = await TestMongodbUtils.createRefreshToken(userId);
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    const testReq = TestHttpUtils.createRequest("POST");
+    testReq.cookies.refreshToken = refreshToken;
+
     const controller = new RefreshAccessController({
-      req: testReq as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
 
     await controller.run();
 
-    expect(sO.status).toBe(405);
+    expect(resultObject.status).toBe(405);
   });
 });
