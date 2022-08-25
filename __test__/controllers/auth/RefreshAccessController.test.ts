@@ -66,22 +66,17 @@ describe("Refresh access controller", () => {
   });
 
   test("should throw token error because of an invalid token", async () => {
-    try {
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      const testReq = TestHttpUtils.createRequest("PUT");
-      testReq.cookies.refreshToken = "xxx.yyy.zzz";
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    const testReq = TestHttpUtils.createRequest("PUT");
+    testReq.cookies.refreshToken = "xxx.yyy.zzz";
 
-      const controller = new RefreshAccessController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
-      });
+    const controller = new RefreshAccessController({
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
+    });
 
-      await controller.run();
-    } catch {
-      expect(resultObject.status).toBe(500);
-    } finally {
-      expect(resultObject.status).toBe(500);
-    }
+    await controller.run();
+    expect(resultObject.status).toBe(401);
   });
 
   test("should throw http method error", async () => {
