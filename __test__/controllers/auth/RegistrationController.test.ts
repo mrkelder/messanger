@@ -1,105 +1,112 @@
+import { NextApiRequest, NextApiResponse } from "next";
+
 import { RegistrationController } from "src/controllers/auth";
 import { UserDocument } from "src/models/User";
-
 import {
-  AuthControllerTestingUtils,
-  StatusObject
-} from "./AuthControllerTestingUtils";
+  TestCredentialsUtils,
+  TestHttpUtils,
+  TestMongodbUtils
+} from "src/utils/TestUtils";
 
-const testUtils = new AuthControllerTestingUtils("registration-test");
+const testUser = new TestCredentialsUtils("registration-test");
+const resultObject = TestHttpUtils.createReultObject();
 
 describe("Registration controller", () => {
-  const { name, password } = testUtils.credentials;
+  const credentials = testUser.getCredentials();
+  const { name, password } = credentials;
 
   beforeEach(async () => {
-    await testUtils.deleteUser();
+    await TestMongodbUtils.deleteUser(name);
   });
 
   afterAll(async () => {
-    await testUtils.deleteUser();
+    await TestMongodbUtils.deleteUser(name);
   });
 
   test("should successfully registrate a user", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
+    const testReq = TestHttpUtils.createRequest("POST");
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    testReq.body.name = name;
+    testReq.body.password = password;
+
     const controller = new RegistrationController({
-      req: testUtils.postReq as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
     await controller.run();
 
-    const registratedUser = (await testUtils.findUser()) as UserDocument;
+    const registratedUser = (await TestMongodbUtils.getUser(
+      name
+    )) as UserDocument;
 
-    expect(sO.status).toBe(200);
+    expect(resultObject.status).toBe(200);
     expect(registratedUser.name).toBe(name);
   });
 
-  test("should throw endpoint error", async () => {
-    let sO: StatusObject = { status: 200 };
-    const testRes = { ...testUtils.res, status: testUtils.statusSetter(sO) };
-    const testReq = { ...testUtils.postReq, method: "GET" };
+  test("should throw http method error", async () => {
+    const testReq = TestHttpUtils.createRequest("GET");
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    testReq.body.name = name;
+    testReq.body.password = password;
+
     const controller = new RegistrationController({
-      req: testReq as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
     await controller.run();
 
-    expect(sO.status).toBe(405);
+    expect(resultObject.status).toBe(405);
   });
 
   test("should throw unprovided name error", async () => {
-    let sO: StatusObject = { status: 200 };
     try {
-      const testReq = { ...testUtils.postReq, body: { password } };
-      const testRes = {
-        ...testUtils.res,
-        status: testUtils.statusSetter(sO)
-      };
+      const testReq = TestHttpUtils.createRequest("POST");
+      const testRes = TestHttpUtils.createResponse(resultObject);
+      testReq.body.password = password;
+
       const controller = new RegistrationController({
-        req: testReq as any,
-        res: testRes
+        req: testReq as NextApiRequest,
+        res: testRes as unknown as NextApiResponse
       });
       await controller.run();
     } catch {
-      expect(sO.status).toBe(500);
+      expect(resultObject.status).toBe(500);
     } finally {
-      expect(sO.status).toBe(500);
+      expect(resultObject.status).toBe(500);
     }
   });
 
   test("should throw unprovided password error", async () => {
-    let sO: StatusObject = { status: 200 };
     try {
-      const testReq = { ...testUtils.postReq, body: { name } };
-      const testRes = {
-        ...testUtils.res,
-        status: testUtils.statusSetter(sO)
-      };
+      const testReq = TestHttpUtils.createRequest("POST");
+      const testRes = TestHttpUtils.createResponse(resultObject);
+      testReq.body.name = name;
+
       const controller = new RegistrationController({
-        req: testReq as any,
-        res: testRes
+        req: testReq as NextApiRequest,
+        res: testRes as unknown as NextApiResponse
       });
       await controller.run();
     } catch {
-      expect(sO.status).toBe(500);
+      expect(resultObject.status).toBe(500);
     } finally {
-      expect(sO.status).toBe(500);
+      expect(resultObject.status).toBe(500);
     }
   });
 
   test("should throw user already exists error", async () => {
-    await testUtils.createUser();
-    let sO: StatusObject = { status: 200 };
-    const testRes = {
-      ...testUtils.res,
-      status: testUtils.statusSetter(sO)
-    };
+    await TestMongodbUtils.createUser(credentials);
+    const testReq = TestHttpUtils.createRequest("POST");
+    const testRes = TestHttpUtils.createResponse(resultObject);
+    testReq.body.name = name;
+    testReq.body.password = password;
+
     const controller = new RegistrationController({
-      req: testUtils.postReq as any,
-      res: testRes
+      req: testReq as NextApiRequest,
+      res: testRes as unknown as NextApiResponse
     });
     await controller.run();
 
-    expect(sO.status).toBe(409);
+    expect(resultObject.status).toBe(409);
   });
 });
