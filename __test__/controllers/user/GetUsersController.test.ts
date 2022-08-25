@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { GetUsersController } from "src/controllers/user";
 import {
   TestCredentialsUtils,
@@ -34,8 +32,8 @@ describe("Get users successful responses", () => {
     testReq.query.userName = testPeer.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -49,8 +47,8 @@ describe("Get users successful responses", () => {
     testReq.query.userName = testPeer.getCredentials().name.substring(5);
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -64,8 +62,8 @@ describe("Get users successful responses", () => {
     testReq.query.userName = testPeer.getCredentials().name.toUpperCase();
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -100,8 +98,8 @@ describe("Get users failure responses", () => {
     testReq.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -115,8 +113,8 @@ describe("Get users failure responses", () => {
     testReq.query.userName = testUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -167,8 +165,8 @@ describe("Get users failure responses", () => {
     const testRes = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -182,8 +180,8 @@ describe("Get users failure responses", () => {
     testReq.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -197,8 +195,8 @@ describe("Get users failure responses", () => {
     testReq.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();

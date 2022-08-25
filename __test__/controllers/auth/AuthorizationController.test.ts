@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { AuthorizationController } from "src/controllers/auth";
 import {
   TestCredentialsUtils,
@@ -34,8 +32,8 @@ describe("Authorzation controller", () => {
       testReq.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
       expect(resultObject.status).toBe(200);
@@ -47,8 +45,8 @@ describe("Authorzation controller", () => {
       testReq.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
 
@@ -62,8 +60,8 @@ describe("Authorzation controller", () => {
         testReq.body.name = name;
 
         const controller = new AuthorizationController({
-          req: testReq as NextApiRequest,
-          res: testRes as unknown as NextApiResponse
+          req: testReq,
+          res: testRes
         });
         await controller.run();
       } catch {
@@ -82,8 +80,8 @@ describe("Authorzation controller", () => {
       testReq.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
       expect(resultObject.status).toBe(405);
@@ -100,8 +98,8 @@ describe("Authorzation controller", () => {
       testReq.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
 

@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { RefreshAccessController } from "src/controllers/auth";
 import JWT from "src/utils/JWT";
 import {
@@ -39,8 +37,8 @@ describe("Refresh access controller", () => {
     testReq.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -56,8 +54,8 @@ describe("Refresh access controller", () => {
     testReq.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -71,8 +69,8 @@ describe("Refresh access controller", () => {
     testReq.cookies.refreshToken = "xxx.yyy.zzz";
 
     const controller = new RefreshAccessController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -87,8 +85,8 @@ describe("Refresh access controller", () => {
     testReq.cookies.refreshToken = refreshToken;
 
     const controller = new RefreshAccessController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();

@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { GetChatsController } from "src/controllers/user";
 import {
   TestCredentialsUtils,
@@ -31,8 +29,8 @@ describe("Chat list", () => {
     const testRes = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -46,8 +44,8 @@ describe("Chat list", () => {
     const testRes = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -60,8 +58,8 @@ describe("Chat list", () => {
     testReq.cookies.accessToken = "xxxxxxx.xxxxxxxxxxx.xxxxxxxxxxxx";
 
     const controller = new GetChatsController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -74,8 +72,8 @@ describe("Chat list", () => {
     const testRes = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetChatsController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();

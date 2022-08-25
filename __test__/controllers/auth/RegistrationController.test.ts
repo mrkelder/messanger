@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { RegistrationController } from "src/controllers/auth";
 import { UserDocument } from "src/models/User";
 import {
@@ -30,8 +28,8 @@ describe("Registration controller", () => {
     testReq.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
     await controller.run();
 
@@ -50,8 +48,8 @@ describe("Registration controller", () => {
     testReq.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
     await controller.run();
 
@@ -65,8 +63,8 @@ describe("Registration controller", () => {
       testReq.body.password = password;
 
       const controller = new RegistrationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
     } catch {
@@ -83,8 +81,8 @@ describe("Registration controller", () => {
       testReq.body.name = name;
 
       const controller = new RegistrationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req: testReq,
+        res: testRes
       });
       await controller.run();
     } catch {
@@ -102,8 +100,8 @@ describe("Registration controller", () => {
     testReq.body.password = password;
 
     const controller = new RegistrationController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
     await controller.run();
 

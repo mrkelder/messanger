@@ -1,7 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { CreateChatController } from "src/controllers/user";
-import JWT from "src/utils/JWT";
 import {
   TestCredentialsUtils,
   TestHttpUtils,
@@ -35,8 +32,8 @@ describe("Create chat controller", () => {
     testReq.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -56,8 +53,8 @@ describe("Create chat controller", () => {
     testReq.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -72,8 +69,8 @@ describe("Create chat controller", () => {
     testReq.cookies.accessToken = "xxxxxxxxxxxx.xxxxxx";
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -87,8 +84,8 @@ describe("Create chat controller", () => {
     testReq.body.peerId = userId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -103,8 +100,8 @@ describe("Create chat controller", () => {
     testReq.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -117,8 +114,8 @@ describe("Create chat controller", () => {
     const testRes = TestHttpUtils.createResponse(resultObject);
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
@@ -153,8 +150,8 @@ describe("Create chat controller", () => {
     testReq.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req: testReq,
+      res: testRes
     });
 
     await controller.run();
