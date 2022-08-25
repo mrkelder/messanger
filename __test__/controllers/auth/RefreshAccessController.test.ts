@@ -25,7 +25,7 @@ describe("Refresh access controller", () => {
   });
 
   afterEach(async () => {
-    await TestMongodbUtils.deleteRefreshToken(credentials.name);
+    await TestMongodbUtils.deleteRefreshToken(ids.userId);
     await TestMongodbUtils.deleteUser(credentials.name);
   });
 
