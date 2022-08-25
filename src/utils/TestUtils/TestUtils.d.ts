@@ -17,6 +17,9 @@ export interface MockRequest {
   body: {
     [key: string]: string | number;
   };
+  query: {
+    [key: string]: string;
+  };
   cookies: {
     [key: string]: string;
   };

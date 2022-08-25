@@ -26,6 +26,7 @@ export class TestHttpUtils {
     return {
       method: httpMethod,
       body: {},
+      query: {},
       cookies: {
         ...(accessTokenUserId && {
           accessToken: JWT.createAccessToken(accessTokenUserId)
