@@ -36,7 +36,11 @@ export class RefreshAccessController extends AuthController {
   }
 
   private checkRefreshTokenValidity(token: string) {
-    JWT.verifyRefreshToken(token);
+    try {
+      JWT.verifyRefreshToken(token);
+    } catch {
+      this.throwRefreshTokenInvalid();
+    }
   }
 
   protected async sendSuccessResponse(userId: string) {
