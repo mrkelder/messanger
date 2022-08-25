@@ -39,6 +39,9 @@ describe("Registration controller", () => {
 
     expect(resultObject.status).toBe(200);
     expect(registratedUser.name).toBe(name);
+
+    const user = (await TestMongodbUtils.getUser(name)) as UserDocument;
+    await TestMongodbUtils.deleteRefreshToken(user.id);
   });
 
   test("should throw http method error", async () => {

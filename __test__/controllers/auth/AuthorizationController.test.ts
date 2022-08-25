@@ -8,6 +8,8 @@ import {
 const testUtils = new TestCredentialsUtils("authorizatoin-test");
 const resultObject = TestHttpUtils.createReultObject();
 
+const ids = { userId: "" };
+
 describe("Authorzation controller", () => {
   const credentials = testUtils.getCredentials();
   const { name, password } = credentials;
@@ -22,7 +24,11 @@ describe("Authorzation controller", () => {
 
   describe("With user creation before the tests", () => {
     beforeEach(async () => {
-      await TestMongodbUtils.createUser(credentials);
+      ids.userId = await TestMongodbUtils.createUser(credentials);
+    });
+
+    afterEach(async () => {
+      await TestMongodbUtils.deleteRefreshToken(ids.userId);
     });
 
     test("should authorizate user", async () => {
