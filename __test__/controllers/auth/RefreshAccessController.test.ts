@@ -6,7 +6,7 @@ import {
   TestMongodbUtils
 } from "src/utils/TestUtils";
 
-const testUser = new TestCredentialsUtils("authorizatoin-test");
+const testUser = new TestCredentialsUtils("refresh-access-test");
 const resultObject = TestHttpUtils.createReultObject();
 
 const ids = {
