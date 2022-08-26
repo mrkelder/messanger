@@ -84,10 +84,9 @@ export class TestMongodbUtils {
     });
   }
 
-  public static async deleteRefreshToken(name: string) {
+  public static async deleteRefreshToken(userId: string) {
     await this.execMongodbOperation(async () => {
-      const user = (await User.findByName(name)) as UserDocument;
-      await RefreshToken.deleteByUserId(user.id);
+      await RefreshToken.deleteByUserId(userId);
     });
   }
 
