@@ -1,7 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { CreateChatController } from "src/controllers/user";
-import JWT from "src/utils/JWT";
 import {
   TestCredentialsUtils,
   TestHttpUtils,
@@ -30,13 +27,13 @@ describe("Create chat controller", () => {
 
   test("Should successfully create a chat", async () => {
     const { userId, peerId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.peerId = peerId;
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -48,16 +45,13 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because user does not exist", async () => {
     const { userId, peerId } = ids;
-    const testReq = TestHttpUtils.createRequest(
-      "POST",
-      userId.replace(/./g, "c")
-    );
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.peerId = peerId;
+    const req = TestHttpUtils.createRequest("POST", userId.replace(/./g, "c"));
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -66,14 +60,14 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because of an invalid accessToken", async () => {
     const { peerId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.peerId = peerId;
-    testReq.cookies.accessToken = "xxxxxxxxxxxx.xxxxxx";
+    const req = TestHttpUtils.createRequest("POST");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.peerId = peerId;
+    req.cookies.accessToken = "xxxxxxxxxxxx.xxxxxx";
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -82,13 +76,13 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because the user and peer ids are equal", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.peerId = userId;
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.peerId = userId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -98,13 +92,13 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because of an unspecified accessToken", async () => {
     const { peerId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.body.peerId = peerId;
+    const req = TestHttpUtils.createRequest("POST");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -113,12 +107,12 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because of an unspecified peer", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -128,13 +122,13 @@ describe("Create chat controller", () => {
   test("Should throw an error because of multiple peer ids", async () => {
     try {
       const { userId, peerId } = ids;
-      const testReq = TestHttpUtils.createRequest("POST", userId);
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.peerId = [peerId, peerId] as any;
+      const req = TestHttpUtils.createRequest("POST", userId);
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.peerId = [peerId, peerId] as any;
 
       const controller = new CreateChatController({
-        req: testReq as any,
-        res: testRes as any
+        req,
+        res
       });
 
       await controller.run();
@@ -147,14 +141,14 @@ describe("Create chat controller", () => {
 
   test("Should throw an error because of an invalid http method", async () => {
     const { userId, peerId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.method = "DELETE";
-    testReq.body.peerId = peerId;
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.method = "DELETE";
+    req.body.peerId = peerId;
 
     const controller = new CreateChatController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();

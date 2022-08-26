@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { AuthorizationController } from "src/controllers/auth";
 import {
   TestCredentialsUtils,
@@ -9,6 +7,8 @@ import {
 
 const testUtils = new TestCredentialsUtils("authorizatoin-test");
 const resultObject = TestHttpUtils.createReultObject();
+
+const ids = { userId: "" };
 
 describe("Authorzation controller", () => {
   const credentials = testUtils.getCredentials();
@@ -24,31 +24,35 @@ describe("Authorzation controller", () => {
 
   describe("With user creation before the tests", () => {
     beforeEach(async () => {
-      await TestMongodbUtils.createUser(credentials);
+      ids.userId = await TestMongodbUtils.createUser(credentials);
+    });
+
+    afterEach(async () => {
+      await TestMongodbUtils.deleteRefreshToken(ids.userId);
     });
 
     test("should authorizate user", async () => {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = name;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = name;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req,
+        res
       });
       await controller.run();
       expect(resultObject.status).toBe(200);
     });
 
     test("should throw unprovided name error", async () => {
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req,
+        res
       });
       await controller.run();
 
@@ -57,13 +61,13 @@ describe("Authorzation controller", () => {
 
     test("should throw unprovided password error", async () => {
       try {
-        const testReq = TestHttpUtils.createRequest("POST");
-        const testRes = TestHttpUtils.createResponse(resultObject);
-        testReq.body.name = name;
+        const req = TestHttpUtils.createRequest("POST");
+        const res = TestHttpUtils.createResponse(resultObject);
+        req.body.name = name;
 
         const controller = new AuthorizationController({
-          req: testReq as NextApiRequest,
-          res: testRes as unknown as NextApiResponse
+          req,
+          res
         });
         await controller.run();
       } catch {
@@ -76,14 +80,14 @@ describe("Authorzation controller", () => {
 
   describe("Without user creation before the tests", () => {
     test("should throw endpoint error", async () => {
-      const testReq = TestHttpUtils.createRequest("GET");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = name;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("GET");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = name;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req,
+        res
       });
       await controller.run();
       expect(resultObject.status).toBe(405);
@@ -94,14 +98,14 @@ describe("Authorzation controller", () => {
 
       await TestMongodbUtils.deleteUser(randomName);
 
-      const testReq = TestHttpUtils.createRequest("POST");
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.body.name = randomName;
-      testReq.body.password = password;
+      const req = TestHttpUtils.createRequest("POST");
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.body.name = randomName;
+      req.body.password = password;
 
       const controller = new AuthorizationController({
-        req: testReq as NextApiRequest,
-        res: testRes as unknown as NextApiResponse
+        req,
+        res
       });
       await controller.run();
 

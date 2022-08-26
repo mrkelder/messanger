@@ -1,5 +1,3 @@
-import { NextApiRequest, NextApiResponse } from "next";
-
 import { GetUsersController } from "src/controllers/user";
 import {
   TestCredentialsUtils,
@@ -29,13 +27,13 @@ describe("Get users successful responses", () => {
 
   test("Should return the user", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testPeer.getCredentials().name;
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testPeer.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -44,13 +42,13 @@ describe("Get users successful responses", () => {
 
   test("Should return the user despite the incompleteness of the name", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testPeer.getCredentials().name.substring(5);
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testPeer.getCredentials().name.substring(5);
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -59,13 +57,13 @@ describe("Get users successful responses", () => {
 
   test("Should return the user despite the casing", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testPeer.getCredentials().name.toUpperCase();
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testPeer.getCredentials().name.toUpperCase();
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -95,13 +93,13 @@ describe("Get users failure responses", () => {
 
   test("Should throw no results error", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testDeletedUser.getCredentials().name;
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -110,13 +108,13 @@ describe("Get users failure responses", () => {
 
   test("Should throw no results error because the user and the search names match", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("GET", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testUser.getCredentials().name;
+    const req = TestHttpUtils.createRequest("GET", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -126,12 +124,12 @@ describe("Get users failure responses", () => {
   test("Should throw an error because of an unspecified search name", async () => {
     try {
       const { userId } = ids;
-      const testReq = TestHttpUtils.createRequest("GET", userId);
-      const testRes = TestHttpUtils.createResponse(resultObject);
+      const req = TestHttpUtils.createRequest("GET", userId);
+      const res = TestHttpUtils.createResponse(resultObject);
 
       const controller = new GetUsersController({
-        req: testReq as any,
-        res: testRes as any
+        req,
+        res
       });
 
       await controller.run();
@@ -145,13 +143,13 @@ describe("Get users failure responses", () => {
   test("Should throw an error because of the multiple search name queries", async () => {
     try {
       const { userId } = ids;
-      const testReq = TestHttpUtils.createRequest("GET", userId);
-      const testRes = TestHttpUtils.createResponse(resultObject);
-      testReq.query.userName = ["name", "name"] as any;
+      const req = TestHttpUtils.createRequest("GET", userId);
+      const res = TestHttpUtils.createResponse(resultObject);
+      req.query.userName = ["name", "name"] as any;
 
       const controller = new GetUsersController({
-        req: testReq as any,
-        res: testRes as any
+        req,
+        res
       });
 
       await controller.run();
@@ -163,12 +161,12 @@ describe("Get users failure responses", () => {
   });
 
   test("Should throw an error because accessToken is not passed", async () => {
-    const testReq = TestHttpUtils.createRequest("GET");
-    const testRes = TestHttpUtils.createResponse(resultObject);
+    const req = TestHttpUtils.createRequest("GET");
+    const res = TestHttpUtils.createResponse(resultObject);
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -176,14 +174,14 @@ describe("Get users failure responses", () => {
   });
 
   test("Should throw an error because accessToken is invalid", async () => {
-    const testReq = TestHttpUtils.createRequest("GET");
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.cookies.accessToken = "xxxxxxxxxxxxxx.xxxxxxxxxx";
-    testReq.query.userName = testDeletedUser.getCredentials().name;
+    const req = TestHttpUtils.createRequest("GET");
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.cookies.accessToken = "xxxxxxxxxxxxxx.xxxxxxxxxx";
+    req.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();
@@ -192,13 +190,13 @@ describe("Get users failure responses", () => {
 
   test("Should throw an error because of invalid http method", async () => {
     const { userId } = ids;
-    const testReq = TestHttpUtils.createRequest("POST", userId);
-    const testRes = TestHttpUtils.createResponse(resultObject);
-    testReq.query.userName = testDeletedUser.getCredentials().name;
+    const req = TestHttpUtils.createRequest("POST", userId);
+    const res = TestHttpUtils.createResponse(resultObject);
+    req.query.userName = testDeletedUser.getCredentials().name;
 
     const controller = new GetUsersController({
-      req: testReq as NextApiRequest,
-      res: testRes as unknown as NextApiResponse
+      req,
+      res
     });
 
     await controller.run();

@@ -1,3 +1,5 @@
+import { NextApiRequest, NextApiResponse } from "next";
+
 import JWT from "../JWT";
 import {
   MockRequest,
@@ -22,7 +24,7 @@ export class TestHttpUtils {
   public static createRequest(
     httpMethod: HttpMethods,
     accessTokenUserId?: string
-  ): MockRequest {
+  ): NextApiRequest {
     return {
       method: httpMethod,
       body: {},
@@ -32,15 +34,15 @@ export class TestHttpUtils {
           accessToken: JWT.createAccessToken(accessTokenUserId)
         })
       }
-    };
+    } as MockRequest as NextApiRequest;
   }
 
-  public static createResponse(sO: ResultObject): MockResponse {
+  public static createResponse(sO: ResultObject): NextApiResponse {
     return {
       ...this.res,
       status: this.statusSetter(sO),
       json: this.jsonSetter(sO)
-    };
+    } as MockResponse as unknown as NextApiResponse;
   }
 
   private static statusSetter(statusObject: ResultObject) {
