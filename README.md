@@ -210,7 +210,7 @@ Basically, the majority of tests are stored within the tested modules (unit test
 - **Screenshot** tests are implemented using storybook's plugin named **chromatic**. Storybooks are stored
 - **E2E** tests are provided via Cypress library
 
-To see tests application in action, please follow [this link](#Development) to the development section
+To see tests application in action, please follow [this link](#development-process) to the development section
 
 ### Stories
 
