@@ -1,7 +1,7 @@
 class Cookie {
   public static get(name: string): string | null {
     const cookies = document.cookie;
-    const regExp = new RegExp(`${name}=[\\d\\w]+`);
+    const regExp = new RegExp(`${name}=[\\d\\w\.]+`);
     const result = cookies.match(regExp);
 
     if (result) return result[0].split("=")[1];
