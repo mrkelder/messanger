@@ -2,7 +2,8 @@ import Cookie from "./index";
 
 const name = "testCookie";
 const value = "testValue";
-const token = "xxxxxxxxxxxxx.xxxxxxxxxxxxxxxxxx.xxxxxxxxxxxx";
+const token =
+  "xxxxxx-2xxxxxxx.xxxxxxxx__ss2FSSXxxxxxxxxxx.xCFSAs231j--__-xxxxxxxx";
 
 describe("Cookie", () => {
   test("Should set a cookie", () => {
