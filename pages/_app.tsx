@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { Provider } from "react-redux";
 
 import Layout from "src/components/Layout";
+import SocketProvider from "src/components/SocketProvider";
 import AxiosContext from "src/contexts/axiosContext";
 import store from "src/store";
 
@@ -18,9 +19,11 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <AxiosContext.Provider value={axiosInstance}>
-        <Layout>
-          <Component {...pageProps} />
-        </Layout>
+        <SocketProvider>
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </SocketProvider>
       </AxiosContext.Provider>
     </Provider>
   );
