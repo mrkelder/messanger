@@ -45,12 +45,19 @@ const SocketProvider: FC<Props> = ({ children }) => {
         }
       });
 
+      innerSocket.on("connect_error", () => {
+        console.log("Should update the accessToken");
+      });
+
       setSocket(innerSocket);
     }
 
-    if (pathname !== "/" && !socket) {
-      connectSocket();
-    } else if (pathname === "/") closeSocket();
+    if (pathname !== "/" && !socket) connectSocket();
+    else if (pathname === "/") closeSocket();
+
+    return () => {
+      closeSocket();
+    };
   }, [axiosInstance, pathname, closeSocket, socket]);
 
   return (
