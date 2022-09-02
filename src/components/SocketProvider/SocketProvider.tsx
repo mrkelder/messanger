@@ -20,7 +20,7 @@ interface Props {
   children: React.ReactNode;
 }
 
-const socketContext = createContext<SocketState>(null);
+export const socketContext = createContext<SocketState>(null);
 
 const SocketProvider: FC<Props> = ({ children }) => {
   const [socket, setSocket] = useState<SocketState>(null);
