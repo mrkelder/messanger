@@ -8,7 +8,7 @@ import { useRouter } from "next/router";
 import { useDispatch } from "react-redux";
 
 import AuthPageTemplate from "src/components/AuthPageTemplate";
-import AxiosContext from "src/contexts/axiosContext";
+import { axiosContext } from "src/components/AxiosProvider";
 import { setUserData } from "src/store/reducers/userReducer";
 import { Credentials } from "src/types/auth";
 import Cookie from "src/utils/Cookie";
@@ -16,7 +16,7 @@ import Cookie from "src/utils/Cookie";
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const axiosInstance = useContext(AxiosContext);
+  const axiosInstance = useContext(axiosContext);
   const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
   const [isRegistration, setIsRegistration] = useState(true);
   const [isAlertOpened, setIsAlertOpened] = useState(false);

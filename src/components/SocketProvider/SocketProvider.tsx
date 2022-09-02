@@ -11,7 +11,7 @@ import {
 import { useRouter } from "next/router";
 import { io, Socket } from "socket.io-client";
 
-import axiosContext from "src/contexts/axiosContext";
+import { axiosContext } from "src/components/AxiosProvider";
 import Cookie from "src/utils/Cookie";
 
 type SocketState = Socket | null;

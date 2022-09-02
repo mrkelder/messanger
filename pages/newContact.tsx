@@ -10,8 +10,8 @@ import { Stack, TextField, Button, Typography, Avatar } from "@mui/material";
 import { GetServerSideProps, GetServerSidePropsResult, NextPage } from "next";
 import { useRouter } from "next/router";
 
+import { axiosContext } from "src/components/AxiosProvider";
 import Header from "src/components/Header";
-import AxiosContext from "src/contexts/axiosContext";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -26,7 +26,7 @@ interface ClientUser {
 const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
-  const axiosInstance = useContext(AxiosContext);
+  const axiosInstance = useContext(axiosContext);
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<ClientUser[]>([]);
   const [isRequestLoading, setIsRequestLoading] =
