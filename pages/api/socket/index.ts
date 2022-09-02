@@ -1,8 +1,9 @@
+import { Server as NetServer } from "http";
+
 import { NextApiRequest } from "next";
 import { Server } from "socket.io";
+
 import { NextApiResponseServerIO, SocketServer } from "src/controllers/socket";
-import { Server as NetServer } from "http";
-import { init } from "src/controllers/testController";
 
 export const config = {
   api: {
@@ -19,6 +20,7 @@ export default async function hanlder(
   if (!ioServer) {
     const httpServer = res.socket.server;
     const io = new Server(httpServer as unknown as NetServer);
+    SocketServer.createMiddlewares(io);
     SocketServer.createConnection(io);
     res.socket.server.io = io;
   } else if (SocketServer.shouldRestartSocketServer(ioServer)) {
