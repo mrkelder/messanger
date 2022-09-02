@@ -68,7 +68,9 @@ const AxiosProvider: FC<Props> = ({ children }) => {
   }, [axiosInstance, dispatch, isRootPage]);
 
   return (
-    <axiosContext.Provider value={{} as any}>{children}</axiosContext.Provider>
+    <axiosContext.Provider value={axiosInstance}>
+      {children}
+    </axiosContext.Provider>
   );
 };
 
