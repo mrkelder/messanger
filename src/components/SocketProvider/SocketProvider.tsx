@@ -4,8 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useState,
-  memo
+  useState
 } from "react";
 
 import { useRouter } from "next/router";
@@ -35,6 +34,21 @@ const SocketProvider: FC<Props> = ({ children }) => {
     }
   }, [socket]);
 
+  const setUpSocket = useCallback(
+    (socket: Socket) => {
+      setSocket(socket);
+
+      socket.on("refresh_token", async () => {
+        const { data } = await axiosInstance.put(
+          process.env.NEXT_PUBLIC_HOST + "/api/auth/refreshAccess"
+        );
+
+        Cookie.set("accessToken", data.accessToken);
+      });
+    },
+    [axiosInstance]
+  );
+
   useEffect(() => {
     async function connectSocket() {
       closeSocket();
@@ -45,24 +59,20 @@ const SocketProvider: FC<Props> = ({ children }) => {
         }
       });
 
-      innerSocket.on("connect_error", () => {
-        console.log("Should update the accessToken");
-      });
-
-      setSocket(innerSocket);
+      setUpSocket(innerSocket);
     }
 
     if (pathname !== "/" && !socket) connectSocket();
     else if (pathname === "/") closeSocket();
 
     return () => {
-      closeSocket();
+      socket?.close();
     };
-  }, [axiosInstance, pathname, closeSocket, socket]);
+  }, [axiosInstance, pathname, closeSocket, socket, setUpSocket]);
 
   return (
     <socketContext.Provider value={socket}>{children}</socketContext.Provider>
   );
 };
 
-export default memo(SocketProvider);
+export default SocketProvider;

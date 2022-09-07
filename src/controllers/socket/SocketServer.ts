@@ -7,15 +7,25 @@ export class SocketServer {
     io.use((socket, next) => {
       try {
         JWT.verifyAccessToken(socket.handshake.auth.token);
-        next();
       } catch (err) {
-        next(new Error((err as unknown as Error).message));
+        socket.emit("refresh_token");
+      } finally {
+        next();
       }
     });
   }
 
   static createConnection(io: Server) {
-    io.on("connection", async socket => {});
+    io.on("connection", async socket => {
+      socket.on("lol", data => {
+        try {
+          JWT.verifyAccessToken(data.token);
+          console.log("lol", data.token);
+        } catch (err) {
+          socket.emit("refresh_token");
+        }
+      });
+    });
   }
 
   static removeListeners(io: Server) {
