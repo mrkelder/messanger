@@ -1,1 +1,1 @@
-export { default } from "./SocketProvider";
+export { default, socketContext } from "./SocketProvider";
