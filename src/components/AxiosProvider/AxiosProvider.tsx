@@ -21,7 +21,8 @@ const AxiosProvider: FC<Props> = ({ children }) => {
   const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_HOST,
     timeout: 100000,
-    params: {}
+    params: {},
+    withCredentials: true
   });
 
   useEffect(() => {
