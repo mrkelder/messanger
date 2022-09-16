@@ -22,7 +22,7 @@ export interface DatabaseMessage {
 
 export interface DatabaseChat {
   _id?: string;
-  members: Omit<DatabaseUser, "password">[];
+  members: string[];
   created_at: string;
   updated_at: string;
 }
