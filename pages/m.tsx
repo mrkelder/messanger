@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { axiosContext } from "src/components/AxiosProvider";
 import ChatLink from "src/components/ChatLink";
 import Header from "src/components/Header";
+import { socketContext } from "src/components/SocketProvider";
 import { RootState } from "src/store";
 import { Chat } from "src/types/chat";
 import JWT from "src/utils/JWT";
@@ -17,9 +18,19 @@ interface Props {
 
 const M: NextPage<Props> = ({ isAccessTokenValid }) => {
   const userId = useSelector<RootState>(store => store.user._id) as string;
+  const socketInstance = useContext(socketContext);
   const axiosInstance = useContext(axiosContext);
   const [chats, setChats] = useState<Chat[]>([]);
   const [areChatsLoaded, setAreChatsLoaded] = useState(false);
+
+  useEffect(() => {
+    if (socketInstance) {
+      socketInstance.on("add_chat", (newChat: Chat) => {
+        if (!chats.find(i => i._id === newChat._id))
+          setChats([newChat, ...chats]);
+      });
+    }
+  }, [socketInstance, chats]);
 
   useEffect(() => {
     async function fetchChats() {
@@ -87,7 +98,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     private static verifyAccessToken(): void {
       try {
-        JWT.verifyAccessToken(SSRHandler.accessToken);
+        JWT.verifyAccessToken(SSRHandler.accessToken as string);
         SSRHandler.setValidAccessTokenConfig();
       } catch {
         SSRHandler.setInvalidAccessTokenConfig();

@@ -12,6 +12,8 @@ import { useRouter } from "next/router";
 
 import { axiosContext } from "src/components/AxiosProvider";
 import Header from "src/components/Header";
+import { socketContext } from "src/components/SocketProvider";
+import Cookie from "src/utils/Cookie";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -26,6 +28,7 @@ interface ClientUser {
 const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
   const router = useRouter();
   const debounceTimer = useRef<NodeJS.Timer | null>(null);
+  const socketInstance = useContext(socketContext);
   const axiosInstance = useContext(axiosContext);
   const [searchValue, setSearchValue] = useState("");
   const [searchResults, setSearchResults] = useState<ClientUser[]>([]);
@@ -45,9 +48,16 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
         { withCredentials: true }
       );
 
-      router.push(`/chat?id=${data.chatId}`);
+      if (data.isNewChat) {
+        socketInstance?.emit("create_chat", {
+          token: Cookie.get("accessToken"),
+          chat: data.chat
+        });
+      }
+
+      router.push(`/chat?id=${data.chat._id}`);
     },
-    [router, axiosInstance]
+    [router, axiosInstance, socketInstance]
   );
 
   const sendSearchRequest = useCallback(
@@ -158,6 +168,7 @@ const NewContact: NextPage<Props> = ({ isAccessTokenValid }) => {
 };
 
 export const getServerSideProps: GetServerSideProps = async context => {
+  // TODO: why don't fetch chats here?
   class SSRHandler {
     public static accessToken = context.req.cookies.accessToken;
     private static returnConfig: GetServerSidePropsResult<Props>;
@@ -181,7 +192,7 @@ export const getServerSideProps: GetServerSideProps = async context => {
 
     private static verifyAccessToken(): void {
       try {
-        JWT.verifyAccessToken(SSRHandler.accessToken);
+        JWT.verifyAccessToken(SSRHandler.accessToken as string);
         SSRHandler.setValidAccessTokenConfig();
       } catch {
         SSRHandler.setInvalidAccessTokenConfig();
