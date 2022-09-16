@@ -1,5 +1,6 @@
 import { FC, useEffect, useState } from "react";
 
+import { Stack } from "@mui/material";
 import { useRouter } from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -46,7 +47,7 @@ const Layout: FC<Props> = ({ children }) => {
     isStoreInitiated
   ]);
 
-  return <>{children}</>;
+  return <Stack height="100vh">{children}</Stack>;
 };
 
 export default Layout;
