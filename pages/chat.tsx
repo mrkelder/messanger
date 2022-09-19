@@ -1,13 +1,22 @@
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 import { Send } from "@mui/icons-material";
 import { IconButton, Stack, TextField } from "@mui/material";
-import { NextPage } from "next";
+import mongoose from "mongoose";
+import { GetServerSideProps, NextPage } from "next";
 
 import Header from "src/components/Header";
+import ChatModel from "src/models/Chat";
+import JWT from "src/utils/JWT";
 
-const Chat: NextPage = () => {
+interface Props {
+  chatId: string;
+}
+
+const Chat: NextPage<Props> = ({ chatId }) => {
   const onSendClick = useCallback(() => {}, []);
+
+  useEffect(() => {}, []);
 
   return (
     <>
@@ -29,6 +38,42 @@ const Chat: NextPage = () => {
       </Stack>
     </>
   );
+};
+
+export const getServerSideProps: GetServerSideProps<Props> = async context => {
+  try {
+    const { id: peerId } = context.query;
+    const { accessToken } = context.req.cookies;
+    const { _id: userId } = await JWT.verifyAccessToken(accessToken as string);
+
+    await mongoose.connect(process.env.MONGODB_HOST as string);
+
+    const chat = await ChatModel.find({
+      members: {
+        $in: [
+          new mongoose.Types.ObjectId(userId),
+          new mongoose.Types.ObjectId(peerId as unknown as string)
+        ]
+      }
+    });
+
+    if (chat.length > 0)
+      return {
+        props: {
+          chatId: chat[0].id
+        }
+      };
+    else throw new Error("Chat doesn't exist"); // TODO: redirect to a page that proposes to create a chat
+  } catch (e) {
+    return {
+      redirect: {
+        destination: "/m",
+        permanent: false
+      }
+    };
+  } finally {
+    if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+  }
 };
 
 export default Chat;
