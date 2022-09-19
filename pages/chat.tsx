@@ -12,12 +12,12 @@ const Chat: NextPage = () => {
   return (
     <>
       <Header variant="chat" />
-      <Stack flex={1} overflow="auto">
+      <Stack flex={1} overflow="auto" px={2}>
         {new Array(100).fill(null).map((i, index) => (
           <p key={`lol_${index}`}>{index}</p>
         ))}
       </Stack>
-      <Stack direction="row" gap={2} px={4}>
+      <Stack direction="row" gap={2} px={2}>
         <TextField fullWidth />
         <IconButton
           onClick={onSendClick}
