@@ -31,10 +31,8 @@ const Chat: NextPage<Props> = ({ chatId }) => {
       socket.on("receive_message", data => {
         console.log(data);
       });
-
-      socket.emit("join_chat", { token: Cookie.get("accessToken"), chatId });
     }
-  }, [socket, chatId]);
+  }, [socket]);
 
   return (
     <>
