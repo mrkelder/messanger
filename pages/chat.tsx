@@ -32,6 +32,10 @@ const Chat: NextPage<Props> = ({ chatId }) => {
         console.log(data);
       });
     }
+
+    return () => {
+      if (socket) socket.off("receive_message");
+    };
   }, [socket]);
 
   return (
