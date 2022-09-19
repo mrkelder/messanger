@@ -42,25 +42,18 @@ const Chat: NextPage<Props> = ({ chatId }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async context => {
   try {
-    const { id: peerId } = context.query;
+    const { id } = context.query;
     const { accessToken } = context.req.cookies;
-    const { _id: userId } = await JWT.verifyAccessToken(accessToken as string);
+    JWT.verifyAccessToken(accessToken as string);
 
     await mongoose.connect(process.env.MONGODB_HOST as string);
 
-    const chat = await ChatModel.find({
-      members: {
-        $in: [
-          new mongoose.Types.ObjectId(userId),
-          new mongoose.Types.ObjectId(peerId as unknown as string)
-        ]
-      }
-    });
+    const chat = await ChatModel.findById(id);
 
-    if (chat.length > 0)
+    if (chat)
       return {
         props: {
-          chatId: chat[0].id
+          chatId: chat.id
         }
       };
     else throw new Error("Chat doesn't exist"); // TODO: redirect to a page that proposes to create a chat
