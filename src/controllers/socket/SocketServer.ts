@@ -86,14 +86,17 @@ export class SocketServer {
         }
       });
 
-      socket.on("join_chat", async data => {
+      socket.on("join_chats", async data => {
         try {
-          const { token, chatId } = data;
+          const { token } = data;
           const { _id } = JWT.verifyAccessToken(token);
 
           await mongoose.connect(process.env.MONGODB_HOST as string);
-          const chat = await Chat.findById(chatId);
-          if (chat?.members.includes(_id)) socket.join(chatId);
+          const chats = await Chat.find({
+            members: { $in: [new mongoose.Types.ObjectId(_id)] }
+          });
+
+          for (const chat of chats) socket.join(chat.id);
         } catch (err) {
           socket.emit("refresh_token");
         } finally {
