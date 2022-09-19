@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import { Server } from "socket.io";
 
 import Chat from "src/models/Chat";
+import Message from "src/models/Message";
 import JWT from "src/utils/JWT";
 
 export class SocketServer {
@@ -107,12 +108,17 @@ export class SocketServer {
       socket.on("send_message", async data => {
         try {
           const { message, token } = data;
-          JWT.verifyAccessToken(token);
-
-          socket.broadcast.emit("receive_message", message);
+          const { _id } = JWT.verifyAccessToken(token);
 
           await mongoose.connect(process.env.MONGODB_HOST as string);
-        } catch (err) {
+          const newMessage = new Message({
+            ...message,
+            author: new mongoose.Types.ObjectId(_id),
+            chatId: new mongoose.Types.ObjectId(message.chatId)
+          });
+          socket.broadcast.emit("receive_message", message);
+          await newMessage.save();
+        } catch {
           socket.emit("refresh_token");
         } finally {
           if (mongoose.connection.readyState === 1) await mongoose.disconnect();

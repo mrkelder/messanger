@@ -22,9 +22,13 @@ const Chat: NextPage<Props> = ({ chatId }) => {
     const token = Cookie.get("accessToken");
     socket?.emit("send_message", {
       token,
-      message: `My id is ${token}`
+      message: {
+        chatId,
+        text: "test text",
+        read: false
+      }
     });
-  }, [socket]);
+  }, [socket, chatId]);
 
   useEffect(() => {
     if (socket) {
