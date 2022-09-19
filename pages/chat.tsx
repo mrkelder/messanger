@@ -56,7 +56,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
           chatId: chat.id
         }
       };
-    else throw new Error("Chat doesn't exist"); // TODO: redirect to a page that proposes to create a chat
+    else return { notFound: true }; // TODO: redirect to a page that proposes to create a chat
   } catch (e) {
     return {
       redirect: {
