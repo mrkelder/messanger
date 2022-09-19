@@ -2,13 +2,18 @@ import { FC } from "react";
 
 import { ArrowBack } from "@mui/icons-material";
 import { Avatar, IconButton, Typography } from "@mui/material";
+import Link from "next/link";
 
 const Chat: FC = () => {
   return (
     <>
-      <IconButton color="inherit" arial-label="back">
-        <ArrowBack fontSize="medium" />
-      </IconButton>
+      <Link href="/m">
+        <a>
+          <IconButton color="inherit" arial-label="back">
+            <ArrowBack fontSize="medium" />
+          </IconButton>
+        </a>
+      </Link>
 
       <Avatar
         sx={{
