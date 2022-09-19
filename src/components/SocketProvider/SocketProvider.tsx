@@ -1,6 +1,7 @@
 import {
   createContext,
   FC,
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -45,6 +46,8 @@ const SocketProvider: FC<Props> = ({ children }) => {
 
         Cookie.set("accessToken", data.accessToken);
       });
+
+      socket.emit("join_chats", { token: Cookie.get("accessToken") });
     },
     [axiosInstance]
   );
@@ -64,15 +67,11 @@ const SocketProvider: FC<Props> = ({ children }) => {
 
     if (pathname !== "/" && !socket) connectSocket();
     else if (pathname === "/") closeSocket();
-
-    return () => {
-      socket?.close();
-    };
-  }, [axiosInstance, pathname, closeSocket, socket, setUpSocket]);
+  }, [axiosInstance, closeSocket, socket, setUpSocket, pathname]);
 
   return (
     <socketContext.Provider value={socket}>{children}</socketContext.Provider>
   );
 };
 
-export default SocketProvider;
+export default memo(SocketProvider);
