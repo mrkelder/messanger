@@ -85,6 +85,36 @@ export class SocketServer {
           if (mongoose.connection.readyState === 1) await mongoose.disconnect();
         }
       });
+
+      socket.on("join_chat", async data => {
+        try {
+          const { token, chatId } = data;
+          const { _id } = JWT.verifyAccessToken(token);
+
+          await mongoose.connect(process.env.MONGODB_HOST as string);
+          const chat = await Chat.findById(chatId);
+          if (chat?.members.includes(_id)) socket.join(chatId);
+        } catch (err) {
+          socket.emit("refresh_token");
+        } finally {
+          if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+        }
+      });
+
+      socket.on("send_message", async data => {
+        try {
+          const { message, token } = data;
+          JWT.verifyAccessToken(token);
+
+          socket.broadcast.emit("receive_message", message);
+
+          await mongoose.connect(process.env.MONGODB_HOST as string);
+        } catch (err) {
+          socket.emit("refresh_token");
+        } finally {
+          if (mongoose.connection.readyState === 1) await mongoose.disconnect();
+        }
+      });
     });
   }
 

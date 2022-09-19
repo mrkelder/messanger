@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useContext } from "react";
 
 import { Send } from "@mui/icons-material";
 import { IconButton, Stack, TextField } from "@mui/material";
@@ -6,7 +6,9 @@ import mongoose from "mongoose";
 import { GetServerSideProps, NextPage } from "next";
 
 import Header from "src/components/Header";
+import { socketContext } from "src/components/SocketProvider";
 import ChatModel from "src/models/Chat";
+import Cookie from "src/utils/Cookie";
 import JWT from "src/utils/JWT";
 
 interface Props {
@@ -14,9 +16,25 @@ interface Props {
 }
 
 const Chat: NextPage<Props> = ({ chatId }) => {
-  const onSendClick = useCallback(() => {}, []);
+  const socket = useContext(socketContext);
 
-  useEffect(() => {}, []);
+  const onSendClick = useCallback(() => {
+    const token = Cookie.get("accessToken");
+    socket?.emit("send_message", {
+      token,
+      message: `My id is ${token}`
+    });
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("receive_message", data => {
+        console.log(data);
+      });
+
+      socket.emit("join_chat", { token: Cookie.get("accessToken"), chatId });
+    }
+  }, [socket, chatId]);
 
   return (
     <>
