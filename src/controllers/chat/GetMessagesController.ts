@@ -6,6 +6,7 @@ import { ClientMessage } from "src/types/chat";
 interface GetMessagesControllerInput {
   chatId: string;
   messagesOffset: number;
+  messagesPerRequest?: number;
 }
 
 export class GetMessagesController {
@@ -13,10 +14,16 @@ export class GetMessagesController {
 
   private chatId: string;
   private messagesOffset: number;
+  private messagesPerRequest: number;
 
-  constructor({ chatId, messagesOffset }: GetMessagesControllerInput) {
+  constructor({
+    chatId,
+    messagesOffset,
+    messagesPerRequest
+  }: GetMessagesControllerInput) {
     this.chatId = chatId;
     this.messagesOffset = messagesOffset;
+    this.messagesPerRequest = messagesPerRequest ?? this.MESSAGES_PER_REQUEST;
   }
 
   public async run(): Promise<ClientMessage[]> {
@@ -65,10 +72,10 @@ export class GetMessagesController {
         }
       },
       {
-        $skip: Math.max(this.messagesOffset * this.MESSAGES_PER_REQUEST, 0)
+        $skip: Math.max(this.messagesOffset * this.messagesPerRequest, 0)
       },
       {
-        $limit: this.MESSAGES_PER_REQUEST
+        $limit: this.messagesPerRequest
       }
     ];
   }
