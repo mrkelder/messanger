@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
 
 import Message from "./Message";
 
@@ -25,8 +26,9 @@ describe("chat message component", () => {
     expect(screen.getByText(MOCK_AUTHOR_NAME)).toBeInTheDocument();
   });
   test("should render a default message when no prop is passed", () => {
-    render(<Message />);
-    expect(screen.getByText("00:00 AM")).toBeInTheDocument();
+    const emptyProps = {} as any;
+    render(<Message {...emptyProps} />);
+    expect(screen.getByText("12:00 AM")).toBeInTheDocument();
     expect(screen.getByText("text")).toBeInTheDocument();
     expect(screen.getByText("User")).toBeInTheDocument();
   });
