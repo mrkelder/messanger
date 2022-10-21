@@ -3,15 +3,15 @@ import { FC } from "react";
 import { Avatar, Stack, Typography } from "@mui/material";
 
 interface Props {
-  dateString: string;
+  date: Date;
   authorName: string;
   text: string;
 }
 
-const Message: FC<Props> = ({ authorName, dateString, text }) => {
-  const date = Intl.DateTimeFormat("en-US", { timeStyle: "short" }).format(
-    new Date(dateString)
-  );
+const Message: FC<Props> = ({ authorName, date, text }) => {
+  const messageTime = Intl.DateTimeFormat("en-US", {
+    timeStyle: "short"
+  }).format(date);
 
   return (
     <Stack py={1} gap={1} direction="row">
@@ -23,14 +23,14 @@ const Message: FC<Props> = ({ authorName, dateString, text }) => {
         <Typography sx={{ wordBreak: "break-word" }}>{text}</Typography>
       </Stack>
       <Typography mr={0} ml="auto">
-        {date}
+        {messageTime}
       </Typography>
     </Stack>
   );
 };
 
 Message.defaultProps = {
-  dateString: new Date("0").toISOString(),
+  date: new Date("0"),
   authorName: "User",
   text: "text"
 };

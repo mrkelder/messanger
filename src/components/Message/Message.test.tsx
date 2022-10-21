@@ -9,17 +9,12 @@ const MOCK_AUTHOR_NAME = "User 6136";
 describe("chat message component", () => {
   test("should render a message of the current date", () => {
     const date = new Date();
-    const dateString = date.toISOString();
     const dateTime = Intl.DateTimeFormat("en-US", {
       timeStyle: "short"
     }).format(date);
 
     render(
-      <Message
-        dateString={dateString}
-        text={MOCK_TEXT}
-        authorName={MOCK_AUTHOR_NAME}
-      />
+      <Message date={date} text={MOCK_TEXT} authorName={MOCK_AUTHOR_NAME} />
     );
     expect(screen.getByText(dateTime)).toBeInTheDocument();
     expect(screen.getByText(MOCK_TEXT)).toBeInTheDocument();
