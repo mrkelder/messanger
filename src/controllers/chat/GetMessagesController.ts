@@ -53,7 +53,6 @@ export class GetMessagesController {
       {
         $match: { chatId: new mongoose.Types.ObjectId(this.chatId) }
       },
-
       {
         $lookup: {
           from: "users",
@@ -76,6 +75,11 @@ export class GetMessagesController {
       },
       {
         $limit: this.messagesPerRequest
+      },
+      {
+        $sort: {
+          created_at: 1
+        }
       }
     ];
   }
