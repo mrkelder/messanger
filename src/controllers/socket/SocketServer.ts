@@ -116,8 +116,8 @@ export class SocketServer {
             author: new mongoose.Types.ObjectId(_id),
             chatId: new mongoose.Types.ObjectId(message.chatId)
           });
-          socket.broadcast.emit("receive_message", message);
           await newMessage.save();
+          socket.broadcast.emit("receive_message", message);
         } catch {
           socket.emit("refresh_token");
         } finally {
