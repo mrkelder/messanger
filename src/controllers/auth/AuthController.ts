@@ -105,7 +105,7 @@ export abstract class AuthController {
   }
 
   protected throwError(statusCode: number, errorMessage: string): ErrorReturn {
-    this.res.status(statusCode).send(errorMessage);
+    if (!this.res.headersSent) this.res.status(statusCode).send(errorMessage);
     this.isUnexpectedErrorThrown = true;
     throw new Error(errorMessage);
   }
