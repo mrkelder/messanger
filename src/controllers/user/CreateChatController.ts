@@ -2,8 +2,14 @@ import mongoose from "mongoose";
 
 import Chat from "src/models/Chat";
 import User from "src/models/User";
+import { DatabaseChat } from "src/types/db";
 
 import { AuthControllerInput, UserController } from "./UserController";
+
+interface Response {
+  chat: DatabaseChat;
+  isNewChat: boolean;
+}
 
 export class CreateChatController extends UserController {
   constructor(conf: AuthControllerInput) {
@@ -20,8 +26,8 @@ export class CreateChatController extends UserController {
     this.checkHttpMethod("POST");
     await this.checkUser(userId);
     await this.checkPeerId(userId, peerId);
-    const chatId = await this.createChat(userId, peerId);
-    this.sendResponse(chatId);
+    const chat = await this.createChat(userId, peerId);
+    this.sendResponse(chat);
   }
 
   private async checkUser(userId: string): Promise<Error | void> {
@@ -37,7 +43,7 @@ export class CreateChatController extends UserController {
     if (!peerUser || userId === peerId) this.throwInvalidPeerId();
   }
 
-  private async createChat(userId: string, peerId: string): Promise<string> {
+  private async createChat(userId: string, peerId: string): Promise<Response> {
     const userIdObject = new mongoose.Types.ObjectId(userId);
     const peerIdObject = new mongoose.Types.ObjectId(peerId);
 
@@ -50,13 +56,11 @@ export class CreateChatController extends UserController {
     if (results.length === 0) {
       const newChat = new Chat({ members: members });
       await newChat.save();
-      return newChat.id;
-    } else return results[0].id;
+      return { chat: newChat, isNewChat: true };
+    } else return { chat: results[0], isNewChat: false };
   }
 
-  protected sendResponse(chatId: string): void {
-    this.res.json({
-      chatId
-    });
+  protected sendResponse(chat: Response): void {
+    this.res.json(chat);
   }
 }

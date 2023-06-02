@@ -5,3 +5,10 @@ export type Chat = Omit<DatabaseChat, "members"> & {
   lastMessage?: DatabaseMessage;
   countOfUnreadMessages: number;
 };
+
+export type ClientMessage = Omit<DatabaseMessage, "author"> & {
+  author: {
+    _id: string;
+    name: string;
+  };
+};

@@ -1,0 +1,1 @@
+export { GetMessagesController } from "./GetMessagesController";
